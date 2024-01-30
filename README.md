@@ -71,6 +71,18 @@ Create the image pull secret. The image pull secret is defined as `ibm-aiops-pul
 ![security](images/ImageSecret.png)
 
 Now apply the bundlemanifest.yaml. Call:
-```
+```bash
 oc apply -f bundlemanifest.yaml
 ```
+
+If successful, it will go into a `Configured` state, if not, go to Home > Events in OpenShift to find diagnostic information
+
+![security](images/Configured.png)
+
+You can delete the pod starting with `aiops-connections-ui` to force a UI refresh or wait 5-10 minutes for it to refresh.
+
+You can see the new ITSM connector, you can create it with the options below
+
+Verify that it is in a `Running` state
+
+Now you can follow the instructions in https://github.com/IBM/cp4aiops-connectors-ticket-template to setup the policy to generate an incident, train the AI, and more.
