@@ -1,0 +1,252 @@
+apiVersion: connectors.aiops.ibm.com/v1beta1
+kind: ConnectorSchema
+metadata:
+  name: ticket-template
+  labels:
+    tickets-connector: "true"
+    notifications-connector: "true"
+spec:
+  categories:
+    - events
+    - tickets
+  ceType: com.ibm.aiops.connectors.configuration
+  components:
+    - apiType: AsyncAPI
+      name: connector
+  documentation: >-
+    https://www.ibm.com/docs/en/cloud-paks/cloud-pak-aiops
+  permissions:
+    channels:
+      - name: cp4waiops-cartridge.lifecycle.input.events
+        operations:
+          - write
+      - name: cp4waiops-cartridge.connector-snow-actions
+        operations:
+          - read
+          - write
+      - name: cp4waiops-cartridge.changerequest
+        operations:
+          - write
+      - name: cp4waiops-cartridge.incident
+        operations:
+          - write
+      - name: cp4waiops-cartridge.itsmincidentresponse
+        operations:
+          - write
+      - name: cp4waiops-cartridge.problem
+        operations:
+          - write
+      - name: cp4waiops-cartridge.snow-handlers
+        operations:
+          - read
+      - name: cp4waiops-cartridge.lifecycle.input.connector-responses
+        operations:
+          - write
+      - name: cp4waiops-cartridge.lifecycle.output.connector-requests
+        operations:
+          - read          
+  encryptedFields:
+    - /password          
+  schema:
+    allOf:
+      - required:
+          - url
+          - username
+          - password
+    properties:
+      password:
+        format: secret
+        type: string
+      types:
+        type: string
+      url:
+        type: string
+      username:
+        type: string
+      datasource_type:
+        default: tickets
+        enum:
+          - tickets
+          - 'tickets,inventory'
+          - inventory
+        type: string
+      historical_config:
+        additionalProperties: false
+        properties:
+          collection_mode:
+            default: historical
+            enum:
+              - historical
+            type: string
+          end_date:
+            format: date-time
+            type: string
+          start_date:
+            format: date-time
+            type: string
+        required:
+          - collection_mode
+          - start_date
+          - end_date
+        type: object  
+      mapping:
+        additionalProperties:
+          type: string
+        type: object              
+    type: object
+  uiSchema:
+    type: ticket-template
+    displayName: "Ticket Template"
+    iconFileType: png
+    iconFileSize: 96
+    categories: 
+      - "{{connector.common.category.notifications}}"
+      - "{{connector.common.category.tickets}}"
+    url: https://www.ibm.com/docs/en/cloud-paks/cloud-pak-aiops
+    apiAdaptor: grpc
+    datasourceType: tickets
+    sidePanelTitle: "{{sidePanel.title.servicenow}}"
+    sidePanelDescription: "{{connector.servicenow.sidepanel.description}}"
+    sidePanelInfoHeader: "{{sidePanel.information.header}}"
+    sidePanelInfo:
+      - "{{common.egress_warning}}"
+      - "{{sidePanel.information.servicenow.1}}"
+      - "{{sidePanel.information.servicenow.2}}"
+    hasOptionalConfig: true
+    sidePanelOptionalConfigHeader: "{{sidePanel.optional.config.header}}"
+    sidePanelOptionalConfigList:
+      - "{{sidePanel.optional.config.fieldMappingSearch}}"
+    hasOptionalText: false
+    hasAIModelType: true
+    isObserver: false
+    deploymentType: ["local", "remote"]
+    AIModelTypeList:
+      - "{{sidePanel.AIModelTypes.changeRisk}}"
+      - "{{sidePanel.AIModelTypes.similarIncidents}}"
+    formSteps:
+      - step:
+          id: addConnection
+          name: "{{formSteps.addConnection}}"
+      - step:
+          id: fieldMapping
+          name: "{{formSteps.fieldMapping}}"
+          isOptional: true
+      - step:
+          id: collectTickets
+          name: "{{formSteps.collectTickets}}"
+          isOptional: true
+    form:
+      - id: name
+        element: input
+        type: text
+        label: "{{connector.common.form.uniqueID.label}}"
+        placeholder: "{{connector.common.form.ops_integration_name.placeholder}}"
+        apiMapping: connection_config.display_name
+        formStep: addConnection
+        isRequired: true
+        maxCharLength: 50
+        isDisabledOnUpdate: true
+        isAlphanumeric: true
+      - id: description
+        element: input
+        type: textarea
+        label: "{{connector.common.form.description.label}}"
+        placeholder: "{{connector.common.form.description.placeholder}}"
+        apiMapping: connection_config.description
+        formStep: addConnection
+        maxCharLength: 600
+      - id: url
+        element: input
+        type: text
+        label: "{{connector.servicenow.form.url.label}}"
+        placeholder: "{{connector.servicenow.form.url.placeholder}}"
+        helperText: "{{common.egress_warning}}"
+        apiMapping: connection_config.url
+        formStep: addConnection
+        isRequired: true
+        isURL : true
+      - id: username
+        element: input
+        type: text
+        label: "{{connector.servicenow.form.user_id.label}}"
+        placeholder: "{{connector.common.form.username.placeholder}}"
+        apiMapping: connection_config.username
+        formStep: addConnection
+        isRequired: true
+      - id: password
+        element: input
+        type: password
+        label: "{{connector.common.form.password.label}}"
+        placeholder: "{{connector.common.form.password.placeholder}}"
+        apiMapping: connection_config.password
+        formStep: addConnection
+        isRequired: true
+      - id: orchestration
+        element: input
+        type: radio
+        label: "{{connector.common.form.orchestration.label}}"
+        items: 
+          - "{{connection_form.dynamic_item.local}}"
+          - "{{connection_form.dynamic_item.remote}}"
+        itemKeys: ["local", "microedge"]
+        apiMapping: connection_config.deploymentType
+        formStep: addConnection
+      - id: connection_test
+        element: input
+        type: test
+        label: "{{connector.common.form.connection_test.label}}"
+        headerLabel: "{{connector.servicenow.form.mappingText.headerLabel}}"
+        formStep: addConnection
+      - id: mapping
+        element: input
+        type: json
+        label: "{{connector.custom.form.mapping.label}}"
+        apiMapping: connection_config.mapping
+        formStep: fieldMapping
+      - id: data_flow
+        element: input
+        type: toggle
+        defaultToggled: false
+        label: "{{connector.common.form.data_flow.label}}"
+        labelOff: "{{common.Off}}"
+        labelOn: "{{common.On}}"
+        headerLabel: "{{connector.common.form.ticketCollection.headerLabel}}"
+        apiMapping: connection_config.data_flow_ticket
+        formStep: collectTickets
+      - id: dynamic_schedule_form
+        element: form
+        label: "{{common.mode}}"
+        items: 
+          - "{{connection_form.dynamic_item.inference.tickets}}"
+          - "{{connection_form.dynamic_item.live.tickets}}"
+          - "{{connection_form.dynamic_item.historical.tickets}}"
+        itemKeys: ["inference", "live", "historical"]
+        apiMapping: connection_config.collection_mode
+        formStep: collectTickets
+        form:
+          - id: inference
+            rows:
+          - id: live
+            rows:
+          - id: historical
+            rows:
+              - id: start
+                element: input
+                type: date
+                label: "{{connector.common.form.start_date.label}}"
+                placeholder: "{{connector.common.form.start_date.placeholder}}"
+                apiMapping: connection_config.start
+              - id: end
+                element: input
+                type: date
+                label: "{{connector.common.form.end_date.label}}"
+                placeholder: "{{connector.common.form.end_date.placeholder}}"
+                apiMapping: connection_config.end
+      - id: types
+        element: input
+        type: text
+        label: "{{connector.servicenow.form.types.label}}"
+        placeholder: "{{connector.servicenow.form.types.placeholder}}"
+        helperText: "{{connector.servicenow.form.types.helperText}}"
+        apiMapping: connection_config.types
+        formStep: collectTickets

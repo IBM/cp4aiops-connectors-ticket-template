@@ -1,0 +1,20 @@
+{
+    "specversion": "1.0",
+    "id": "f72bd55a-bc53-49ec-9dcf-fd5169e54acf",
+    "source": "template.connectors.aiops.watson.ibm.com/connectorsnow",
+    "type": "com.ibm.sdlc.snow.comment.create.completed",
+    "datacontenttype": "application/json",
+    "time": "2024-01-23T22:58:22.01275255Z",
+    "structuredcontentmode": "true",
+    "responsetime": "616546763052",
+    "connectionid": "2ad17534-f487-4fd8-bd10-0b86b802ce5e",
+    "componentname": "connector",
+    "tooltype": "com.ibm.sdlc.type.snow",
+    "data": {
+        "sys_id": "f985709b47f3b51040c1b60e316d4377",
+        "connection_id": "2ad17534-f487-4fd8-bd10-0b86b802ce5e",
+        "kind": "change_request",
+        "snow_response": "{\"error\":{\"message\":\"No Record found\",\"detail\":\"Record doesn't exist or ACL restricts the record retrieval\"},\"status\":\"failure\"}",
+        "work_notes": "IBM Cloud Pak for Watson AIOps does not classify this as a high risk change. It might be due to lack of evidence or evidence exhibit no risk. \n\n Confidence: [code]<b>90%<\/b>[/code] \n\n "
+    }
+}     
