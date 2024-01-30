@@ -1,0 +1,216 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ticket-template
+  labels:
+    app: ticket-template
+    connectors.aiops.ibm.com/restart-on-secret-changed: ""
+spec:
+  selector:
+    matchLabels:
+      app: ticket-template
+      instance: connector
+  template:
+    metadata:
+      labels:
+        app: ticket-template
+        instance: connector
+    spec:
+      imagePullSecrets:
+        - name: ibm-aiops-pull-secret
+      restartPolicy: Always
+      serviceAccountName: connector
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/arch
+                    operator: In
+                    values:
+                      - amd64
+                      - ppc64le
+                  - key: kubernetes.io/os
+                    operator: In
+                    values:
+                      - linux
+      initContainers:
+        - image: ticket-template:unreleased-main-latest
+          imagePullPolicy: Always
+          name: cert-setup
+          command:
+            - "/opt/import-certs.sh"
+          resources:
+            requests:
+              cpu: 200m
+              memory: 300Mi
+              ephemeral-storage: "0"
+            limits:
+              cpu: 200m
+              memory: 500Mi
+              ephemeral-storage: 200Mi
+          volumeMounts:
+            - name: server-certs-raw
+              mountPath: /opt/raw-cert
+            - name: server-certs
+              mountPath: /opt/cert
+            - name: config-overrides
+              mountPath: /config/configDropins/overrides/
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            readOnlyRootFilesystem: false
+            runAsNonRoot: true
+      containers:
+        - image: ticket-template:unreleased-main-latest
+          imagePullPolicy: Always
+          name: ticket-template
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: KAFKA_SCRAM_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: user
+                  name: aiopsedge-kafka-application-secret
+            - name: KAFKA_SCRAM_PASSWORD_PATH
+              value: /etc/zeno/secrets/kafka/password
+            - name: KAFKA_TRUSTSTORE_PATH
+              value: /etc/zeno/secrets/kafka/truststore.jks
+            - name: KAFKA_TRUSTSTORE_PASSWORD_PATH
+              value: /etc/zeno/secrets/kafka/truststore.password
+            - name: KAFKA_PROD_ACKS
+              value: "1"
+            - name: KAFKA_PROD_BATCH_SIZE
+              value: "16384"
+            - name: KAFKA_PROD_LINGER_MS
+              value: "10"
+            - name: KAFKA_PROD_COMPRESSION_TYPE
+              value: "none"    
+            - name: KAFKA_PROD_BUFFER_MEMORY
+              value: "33554432"                                      
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              valueFrom:
+                secretKeyRef:
+                  key: bootstrapServers
+                  name: aiopsedge-kafka-application-secret                   
+          ports:
+            - containerPort: 9443
+              name: metrics
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 200m
+              memory: 400Mi
+              ephemeral-storage: "0"
+            limits:
+              cpu: "1"
+              memory: 512Mi
+              ephemeral-storage: 1Gi
+          livenessProbe:
+            httpGet:
+              path: /h/live
+              port: 9080
+            initialDelaySeconds: 60
+            successThreshold: 1
+            failureThreshold: 3
+            periodSeconds: 30
+            timeoutSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /h/ready
+              port: 9080
+            initialDelaySeconds: 30
+            successThreshold: 1
+            failureThreshold: 3
+            periodSeconds: 10
+            timeoutSeconds: 10
+          volumeMounts:
+            - name: server-certs
+              mountPath: /opt/cert
+            - name: grpc-bridge-service-binding
+              mountPath: /bindings/grpc-bridge
+            - name: config-overrides
+              mountPath: /config/configDropins/overrides/
+            - mountPath: /etc/zeno/secrets/kafka
+              name: kafka-secret-vol
+            - name: elastic
+              mountPath: "/bindings/elastic/hostname"
+              subPath: host
+            - name: elastic
+              mountPath: "/bindings/elastic/password"
+              subPath: password
+            - name: elastic
+              mountPath: "/bindings/elastic/port"
+              subPath: port
+            - name: elastic
+              mountPath: "/bindings/elastic/username"
+              subPath: username                                          
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            readOnlyRootFilesystem: false
+            runAsNonRoot: true
+      hostNetwork: false
+      hostPID: false
+      hostIPC: false
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: server-certs-raw
+          secret:
+            secretName: ticket-template
+            defaultMode: 420
+        - name: server-certs
+          emptyDir: {}
+        - name: config-overrides
+          emptyDir: {}
+        - name: kafka-secret-vol
+          secret:
+            defaultMode: 420
+            secretName: aiopsedge-kafka-application-secret          
+        - name: grpc-bridge-service-binding
+          projected:
+            sources:
+              - secret:
+                  name: connector-bridge-connection-info
+                  items:
+                    - key: ca.crt
+                      path: ca.crt
+                    - key: tls.crt
+                      path: tls.crt
+                    - key: tls.key
+                      path: tls.key
+                    - key: host
+                      path: host
+                    - key: port
+                      path: port
+              - secret:
+                  name: connector
+                  items:
+                    - key: id
+                      path: id
+                    - key: client-id
+                      path: client-id
+                    - key: client-secret
+                      path: client-secret
+              - secret:
+                  name: aiopsedge-health-check-key
+                  items:
+                    - key: apikey
+                      path: metric-api-key
+        - name: elastic
+          secret:
+            secretName: ibm-aiops-es-aiops-user-connection-secret
+            defaultMode: 420

@@ -1,0 +1,9 @@
+{
+    "collection_mode": "inference",
+    "data_flow": true,
+    "end": 1701907199999,
+    "password": "pass",
+    "start": 1701388800000,
+    "url": "https://example.com",
+    "username": "admin"
+}
