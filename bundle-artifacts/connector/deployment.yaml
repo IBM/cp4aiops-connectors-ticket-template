@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ticket-template
+  name: ticket-system
   labels:
-    app: ticket-template
+    app: ticket-system
     connectors.aiops.ibm.com/restart-on-secret-changed: ""
 spec:
   selector:
     matchLabels:
-      app: ticket-template
+      app: ticket-system
       instance: connector
   template:
     metadata:
       labels:
-        app: ticket-template
+        app: ticket-system
         instance: connector
     spec:
       imagePullSecrets:
@@ -35,7 +35,7 @@ spec:
                     values:
                       - linux
       initContainers:
-        - image: ticket-template:unreleased-main-latest
+        - image: ticket-system:unreleased-main-latest
           imagePullPolicy: Always
           name: cert-setup
           command:
@@ -65,9 +65,9 @@ spec:
             readOnlyRootFilesystem: false
             runAsNonRoot: true
       containers:
-        - image: ticket-template:unreleased-main-latest
+        - image: ticket-system:unreleased-main-latest
           imagePullPolicy: Always
-          name: ticket-template
+          name: ticket-system
           env:
             - name: POD_NAME
               valueFrom:
@@ -170,7 +170,7 @@ spec:
       volumes:
         - name: server-certs-raw
           secret:
-            secretName: ticket-template
+            secretName: ticket-system
             defaultMode: 420
         - name: server-certs
           emptyDir: {}

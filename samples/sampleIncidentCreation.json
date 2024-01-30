@@ -62,7 +62,7 @@
                                 "status": "Running",
                                 "displayName": "ticket",
                                 "connectorUID": "f58ef527-c84d-480d-9b85-f78a07cd3174",
-                                "connectionType": "ticket-template"
+                                "connectionType": "ticket-system"
                             }
                         },
                         {

@@ -4,12 +4,11 @@ kind: Kustomization
 resources:
   - connectorschema.yaml
   - microedgeconfiguration.yaml
-  # - topics.yaml
 
 configurations:
   - custom-images.yaml
 
 images:
-  - name: ticket-template
-    newName: PLACEHOLDER_REGISTRY_ADDRESS/cp/aiopsedge/cp4waiops-connector-ticket-template
+  - name: ticket-system
+    newName: PLACEHOLDER_REGISTRY_ADDRESS/cp/aiopsedge/cp4waiops-connector-ticket-system
     newTag: latest
