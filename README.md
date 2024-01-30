@@ -1,6 +1,10 @@
 # Ticket Integration Template
 This generic ticket template generates dummy data that can train Similar Incident and Change Risk AI models.
 
+A quick start guide to customizing the connector name, building the image, and running compare the branches via: https://github.com/IBM/cp4aiops-connectors-ticket-template/compare/sample01?expand=1
+
+For a quick start to begin development, see the explanation via: https://github.com/IBM/cp4waiops-connectors-java-template/blob/main/SampleSetup.md
+
 ## Architecture
 ![Architecture](images/ticket-architecture4.3.jpg)
 
