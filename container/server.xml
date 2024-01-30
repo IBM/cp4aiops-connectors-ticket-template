@@ -12,7 +12,7 @@
                 host="*"
                 httpsPort="9443"/>
 
-  <webApplication location="ticket-template.war" contextRoot="/" />
+  <webApplication location="ticket-system.war" contextRoot="/" />
 
   <!-- fine level logging. In production, decrease this level of tracing for improved performance. This is for DEBUGGING only -->
   <logging consoleFormat="simple" consoleSource="message,trace" consoleLogLevel="fine" traceFileName="stdout" traceFormat="BASIC" traceSpecification="com.ibm.aiops.connectors.*=info:com.ibm.cp4waiops.connectors.*=all" />

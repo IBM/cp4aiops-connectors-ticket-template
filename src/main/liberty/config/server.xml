@@ -12,7 +12,7 @@
         <feature>cdi-2.0</feature>
     </featureManager>
 
-    <webApplication location="ticket-template.war" contextRoot="/" />
+    <webApplication location="ticket-system.war" contextRoot="/" />
 
     <!-- To access this server from a remote client add a host attribute to the following element, e.g. host="*" -->
     <httpEndpoint id="defaultHttpEndpoint"

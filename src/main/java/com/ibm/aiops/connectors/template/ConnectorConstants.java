@@ -24,5 +24,5 @@ public class ConnectorConstants {
     static final String LIVE = "live";
 
     // Self identifier
-    static final URI SELF_SOURCE = URI.create("template.connectors.aiops.ibm.com/ticket-template");
+    static final URI SELF_SOURCE = URI.create("template.connectors.aiops.ibm.com/ticket-system");
 }

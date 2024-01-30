@@ -26,7 +26,7 @@ COPY --chown=1001:0 container/jvm.options /config/
 COPY --chown=1001:0  container/server.xml /config/
 RUN features.sh && configure.sh
 
-COPY --from=builder --chown=1001:0 /build/connector/target/ticket-template.war /config/apps/
+COPY --from=builder --chown=1001:0 /build/connector/target/ticket-system.war /config/apps/
 
 USER 1001
 

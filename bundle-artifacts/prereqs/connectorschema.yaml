@@ -1,7 +1,7 @@
 apiVersion: connectors.aiops.ibm.com/v1beta1
 kind: ConnectorSchema
 metadata:
-  name: ticket-template
+  name: ticket-system
   labels:
     tickets-connector: "true"
     notifications-connector: "true"
@@ -95,8 +95,8 @@ spec:
         type: object              
     type: object
   uiSchema:
-    type: ticket-template
-    displayName: "Ticket Template"
+    type: ticket-system
+    displayName: "ITSM"
     iconFileType: png
     iconFileSize: 96
     categories: 
