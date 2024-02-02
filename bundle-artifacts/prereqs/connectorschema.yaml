@@ -101,7 +101,6 @@ spec:
     iconFileSize: 96
     categories: 
       - "{{connector.common.category.notifications}}"
-      - "{{connector.common.category.tickets}}"
     url: https://www.ibm.com/docs/en/cloud-paks/cloud-pak-aiops
     apiAdaptor: grpc
     datasourceType: tickets
