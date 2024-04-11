@@ -1,14 +1,11 @@
 {
-    "collection_mode": "historical",
+    "collectionMode": "historical",
     "data_flow": true,
     "end": 1701907199999,
-    "mapping": {
-        "field": "mapping",
-        "field2": "mapping2"
-    },
-    "password": "pass",
     "start": 1701388800000,
-    "types": "change_request",
-    "url": "https://example.com",
-    "username": "admin"
+    "mappingsGithub": "mappings",
+    "token": "pass",
+    "repo": "repo",
+    "owner": "owner",
+    "url": "https://example.com"
 }
