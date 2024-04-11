@@ -5,7 +5,7 @@ metadata:
 spec:
   prereqs:
     repo: 'https://github.com/IBM/cp4aiops-connectors-github-template'
-    branch: github-connector-sample
+    branch: main
     authSecret:
       name: test-utilities-github-token
     components:
