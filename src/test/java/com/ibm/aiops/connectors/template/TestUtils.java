@@ -10,29 +10,20 @@
 
 package com.ibm.aiops.connectors.template;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.io.IOException;
-import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.util.HashMap;
-import java.util.concurrent.CompletableFuture;
-
-import com.ibm.aiops.connectors.template.integrations.GithubIntegration;
-import com.ibm.cp4waiops.connectors.sdk.Util;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import com.ibm.cp4waiops.connectors.sdk.Util;
 
 import io.cloudevents.CloudEvent;
 

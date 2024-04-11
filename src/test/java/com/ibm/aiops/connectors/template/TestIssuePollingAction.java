@@ -5,7 +5,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
-import java.net.http.HttpHeaders;
 import java.net.http.HttpResponse;
 
 import org.junit.jupiter.api.Assertions;
