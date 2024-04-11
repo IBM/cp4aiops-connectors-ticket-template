@@ -1,21 +1,35 @@
-REGISTRY ?= docker-na-public.artifactory.swg-devops.com/hyc-connector-framework-team-integrations-docker-local
+REGISTRY ?= PLACEHOLDER_REGISTRY_ADDRESS
 TAG ?= latest
 
-IMAGE := $(REGISTRY)/cp/aiopsedge/cp4waiops-connector-ticket-template:$(TAG)
+IMAGE := $(REGISTRY)/cp/aiopsedge/github-grpc-connector-template:$(TAG)
 
-docker-login:
-	docker login $(REGISTRY) -u "$$REGISTRY_USERNAME" -p "$$REGISTRY_PASSWORD"
+ifeq ($(shell uname -s),Darwin)
+	# gnu-sed, can be installed using homebrew
+	SED_EXE := gsed
+else
+	SED_EXE := sed
+endif
 
-docker-build:
+podman-login:
+	podman login $(REGISTRY) -u "$$REGISTRY_USERNAME" -p "$$REGISTRY_PASSWORD"
+
+podman-build:
 	chmod ug+x container/import-certs.sh
-	docker build -f container/Dockerfile -t $(IMAGE) .
+	podman build -f container/Dockerfile -t $(IMAGE) .
 
-docker-push:
-	docker push $(IMAGE)
+podman-push:
+	podman push $(IMAGE)
 
-docker-build-ci:
-	chmod ug+x container/import-certs.sh
-	docker build -f container/Dockerfile -t $(IMAGE) .
+.PHONY: format
+format:
+	mvn formatter:format
 
-docker-push-ci:
-	docker push $(IMAGE)
+.PHONY: lint-check
+lint-check:
+	mvn pmd:check formatter:format formatter:validate -Dpmd.printFailingErrors=true
+
+.PHONY: test
+test:
+	mvn test
+
+

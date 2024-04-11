@@ -1,7 +1,7 @@
 apiVersion: connectors.aiops.ibm.com/v1beta1
 kind: BundleManifest
 metadata:
-  name: ticket-template
+  name: github-grpc-connector-template
 spec:
   prereqs:
     repo: 'https://github.com/IBM/cp4aiops-connectors-ticket-template'

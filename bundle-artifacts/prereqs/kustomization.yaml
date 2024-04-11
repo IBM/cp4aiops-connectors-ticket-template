@@ -10,6 +10,6 @@ configurations:
   - custom-images.yaml
 
 images:
-  - name: ticket-template
-    newName: PLACEHOLDER_REGISTRY_ADDRESS/cp/aiopsedge/cp4waiops-connector-ticket-template
+  - name: github-grpc-connector-template
+    newName: PLACEHOLDER_REGISTRY_ADDRESS/cp/aiopsedge/github-grpc-connector-template
     newTag: latest
