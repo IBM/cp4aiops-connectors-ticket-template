@@ -15,9 +15,9 @@ You can fill in any valid data.
 ![Integration 3](images/github-template/integration5.png)
 
 Press `Done`
-![Integration Table](images/github-template/integration5.png)
+![Integration Table](images/github-template/integration-failed.png)
 `Running` indicates that it is configured properly
-
+TODO: add an image with running
 
 ### Train the AI for Similar Incident and Change Risk
 Go to the AI management page
@@ -40,20 +40,20 @@ Choose `Promote alerts to an incident`
 
 Fill in the details and add github integration in the ticket section.
 
-![Policy 1](images/github/policy1.png)
+![Policy 1](images/github-template/Policy1.png)
 
 Click on Save button
-![Policy 2](images/github/policy2.png)
+![Policy 2](images/github-template/policy2.png)
 Check if the specification have the added github integration
-![Policy 3](images/github/policy.png)
+![Policy 3](images/github-template/policy.png)
 
 Make sure you set the event count increasing as a reason to generate an incident. Otherwise you need to modify the code to generate a new alert
 
 ## Incident Creation
 Trigger Incident and see the details in incident details page
-![Incident](images/github/Incident1.png)
+![Incident](images/github-template/Incident1.png)
 
 See the similar tickets in the past resolution tickets.
 
 Click on the Github Link that mentioned in the right side box to see the Github issue.
-![Github](images/github/github1.png)
+![Github](images/github-template/github1.png)
