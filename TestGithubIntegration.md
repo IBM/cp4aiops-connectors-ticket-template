@@ -2,20 +2,20 @@
 
 ## Testing
 ### Create The Github Integration
-![Add Integration](images/github/Integration.png)
+![Add Integration](images/github-template/Integration.png)
 
 Search for `Github` to add your newly added integration.
-![Search Integration](images/github/integration1.png)
-![Search Integration](images/github/integration2.png)
+![Search Integration](images/github-template/github-template-integration.png)
+![Search Integration](images/github-template/integration2.png)
 
 You can fill in any valid data.
 
-![Integration 1](images/github/integration3.png)
-![Integration 2](images/github/integration4.png)
-![Integration 3](images/github/integration5.png)
+![Integration 1](images/github-template/integration3.png)
+![Integration 2](images/github-template/integration4.png)
+![Integration 3](images/github-template/integration5.png)
 
 Press `Done`
-![Integration Table](images/github/integration5.png)
+![Integration Table](images/github-template/integration5.png)
 `Running` indicates that it is configured properly
 
 
