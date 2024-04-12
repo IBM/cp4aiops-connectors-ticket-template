@@ -157,47 +157,72 @@ oc delete pod github-grpc-connector-template-49445af7-ef2a-4692-b564-636a354bgq
 
 The new pod that starts up will pull the latest image.
 
+# Test the Github Integration Template
+
+Open [TestGithubIntegration.md](TestGithubIntegration.md)
+
 # Development with Maven + Local deployment
-Create the Github template integration. For example, named `githubcathy`
 
-![integration](images/remote.png)
+In the OpenShift console, go to the `ConnectorConfiguration`. Go to `instances` and look for `githubtemplate`
 
-In the OpenShift console, go to the `ConnectorConfiguration`. Go to `instances` and look for `githubcathy`
+![ConnectorConfiguration](images/github-template/connectorConfiguration-yaml.png)
 
-The `uuid` is `2e6c7bec-1b61-40d9-b2f1-b1be9c032bcd`
+The `uuid` is `537328bf-192a-457d-b0c7-9ebc41641c9a`
 
-Next, go to `Secrets` to look for the certificates created for that connector. They will have the suffix of the `uuid`
+To find the information needed in src/main/liberty/config/bootstrap.properties, if you want to run teh github-template locally connected to your remote cluster, connect to your cluster and then run the following script:
 
-For example, the secret of interest is:
-`connector-2e6c7bec-1b61-40d9-b2f1-b1be9c032bcd`
-
-When looking at the data, the `client-id` is `2e6c7bec-1b61-40d9-b2f1-b1be9c032bcd`, `client-secret` is `IPwrjzKEFV9imCl6bt94ApcuKoZgRumI69Imfj2XaNpUvw91sWwi2NSWH8Mm`
-
-Next go the `Deployments` and look for the integration. For example, mine is `github-grpc-connector-template-2e6c7bec-1b61-40d9-b2f1-b1be9c032bcd` (part of the `uuid` is used as the suffix, the rest is padded by OpenShift, so searching for the first couple of letters of the `uuid` is the easiest way)
-
-Open the yaml and set the `replica` to 0:
-```yaml
-spec:
-  replicas: 0
 ```
+#!/bin/bash
 
-For the gRPC bridge and connector communication, only ONE can exist for a particular `uuid`. If you have multiple integrations with the same `uuid`, then the bridge will only connect to one of them. In this case, we want the only connection to be our local connection on our machine for debugging, not the pod running on the cluster.
+CONNECTOR_UID=537328bf-192a-457d-b0c7-9ebc41641c9aA
 
-Go to the `Secret` `connector-bridge-connection-info` and get the certs.
+CONNECTOR_BRIDGE_SECRET=$(oc get secret connector-bridge-connection-info -o json)
+CONNECTOR_OAUTH_SECRET=$(oc get secret "connector-${CONNECTOR_UID}" -o json)
+
+CONNECTOR_BRIDGE_SERVER_CA=$(echo "${CONNECTOR_BRIDGE_SECRET}" | jq -r '.data["ca.crt"]' | base64 --decode)
+CONNECTOR_BRIDGE_CLIENT_CA=$(echo "${CONNECTOR_BRIDGE_SECRET}" | jq -r '.data["tls.crt"]' | base64 --decode)
+CONNECTOR_BRIDGE_CLIENT_KEY=$(echo "${CONNECTOR_BRIDGE_SECRET}" | jq -r '.data["tls.key"]' | base64 --decode)
+CONNECTOR_BRIDGE_HOST=$(echo "${CONNECTOR_BRIDGE_SECRET}" | jq -r '.data["external-host"]' | base64 --decode)
+CONNECTOR_BRIDGE_PORT=$(echo "${CONNECTOR_BRIDGE_SECRET}" | jq -r '.data["external-port"]' | base64 --decode)
+
+
+echo -e " Server CA (place in /tmp/connector_ca.crt) " 
+echo "${CONNECTOR_BRIDGE_SERVER_CA}"
+echo ""
+
+echo -e "Client CA (place in /tmp/connector_tls.crt)"
+echo "${CONNECTOR_BRIDGE_CLIENT_CA}"
+echo ""
+
+echo -e "Client key (place in /tmp/connector_tls.key"
+echo "${CONNECTOR_BRIDGE_CLIENT_KEY}"
+echo ""
+
+
+echo -e "Dev connector configuration (place in src/main/liberty/config/bootstrap.properties)"
+cat <<EOF
+# These settings are developer setting, they will not be used in the produced docker file
+grpc-bridge.host=${CONNECTOR_BRIDGE_HOST}
+grpc-bridge.port=${CONNECTOR_BRIDGE_PORT}
+grpc-bridge.server-certificate-file="/tmp/connector_ca.crt"
+grpc-bridge.client-certificate-file="/tmp/connector_tls.crt"
+grpc-bridge.client-private-key-file="/tmp/connector_tls.key"
+grpc-bridge.id="${CONNECTOR_UID}"
+
+grpc-bridge.client-id="${CONNECTOR_OAUTH_CLIENT_ID}"
+grpc-bridge.client-secret="${CONNECTOR_OAUTH_CLIENT_SECRET}"
+EOF
+
+```
 
 Create a folder called `certs` in the root directory.
 Copy the properties found above:
 - Copy `caCertificate` property into `certs/ca.crt` (everything starting from `-----BEGIN CERTIFICATE-----` and ending with `-----END CERTIFICATE-----`)
 - Copy `tlscrt` property into `certs/tls.crt` (everything starting from `-----BEGIN CERTIFICATE-----` and ending with `-----END CERTIFICATE-----`)
 - Copy `tlskey` property into `certs/tls.key` (everything starting from `-----BEGIN RSA PRIVATE KEY-----` and ending with `-----END RSA PRIVATE KEY-----`)
-- Copy `host` into the property `grpc-bridge.host` 
-- Copy `clientID` into the property `grpc-bridge.client-id` and `connector-template.id`
-- Copy `clientSecret` into the property `grpc-bridge.client-secret`
 
+Replace the correct information in the src/main/liberty/config/bootstrap.properties file:
 
-Keep a note of `external-host` and `external-port`, since you will need to update the `bootstrap.properties` with it . 
-
-In [src/main/liberty/config/bootstrap.properties](src/main/liberty/config/bootstrap.properties), this file defines the properties used to connect to the gRPC server.
 For example (I hid the host):
 
 ```
@@ -225,6 +250,19 @@ com.ibm.ws.logging.trace.file.name=stdout
 com.ibm.ws.logging.trace.format=BASIC
 com.ibm.ws.logging.trace.specification="*=warning:com.ibm.aiops.connectors.*=all"
 ```
+
+
+
+Next go the `Deployments` and look for the integration. For example, mine is `github-grpc-connector-template-537328bf-192a-457d-b0c7-9ebc41641c9a` (part of the `uuid` is used as the suffix, the rest is padded by OpenShift, so searching for the first couple of letters of the `uuid` is the easiest way)
+
+Open the yaml and set the `replica` to 0:
+```yaml
+spec:
+  replicas: 0
+```
+
+For the gRPC bridge and connector communication, only ONE can exist for a particular `uuid`. If you have multiple integrations with the same `uuid`, then the bridge will only connect to one of them. In this case, we want the only connection to be our local connection on our machine for debugging, not the pod running on the cluster.
+
 
 Now, go to the root of the project and run:
 ```
