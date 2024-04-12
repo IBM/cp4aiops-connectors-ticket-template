@@ -1,20 +1,18 @@
 # Github Integration Template
 
-This page provides a complete end to end scenario to get the github template connector  `github-grpc-connector-template` running in CP4AIOps. 
-
-Completed code can be found via: https://github.com/cookcm/cp4waiops-connectors-java-template
+This page provides a complete end to end scenario to get the github integration template `github-grpc-connector-template` running in CP4AIOps.
 
 # Prerequisites
 - Podman (https://podman.io/docs/installation) or Rancher Desktop (https://rancherdesktop.io/)
 - CPAIOps installed
-- Docker image repository
+- Docker image repository (ex: https://hub.docker.com)
 
 # Development Environment Setup
 1. Fork the repo: https://github.com/IBM/cp4aiops-connectors-ticket-template
 This operation clones the repository and all its branches into your account.
 
 2. Clone Your Fork to your local machine.
-Replace YourUsername with your GitHub username
+Replace `YourUsername` with your GitHub username
 ```bash
 git clone https://github.com/YourUsername/cp4aiops-connectors-github-template.git
 ```
@@ -31,18 +29,17 @@ git checkout -b github-connector-sample origin/github-connector-sample
     podman machine start
     ```
     Or start rancher desktop with docker daemon enabled via the user interface
-1. Login to Docker, for example:
+1. Login to Docker repository, for example:
     ```bash
     docker login docker.io/<owner>
     ```
-1. Build the image by calling the following command from the root of the project directory. For the tag, use the Docker image location you had previously logged into
+1. Build the image by calling the following command from the root of the project directory. Choose between podman or docker based on what you installed. For the build tag, use the Docker image location you had previously logged into.
     ```
     <podman or docker> build -f container/Dockerfile -t docker.io/<YourUsername>/sample-github-template:latest .
     ```
-    Choose between podman or docker based on what you installed. 
-    Replace <YourUsername> by the repository's owner, in our example
+   
 1. While the image is building (it can take several minutes), the template code requires some modifications for it to run. Begin by updating the GitHub location. Open [bundlemanifest.yaml](bundlemanifest.yaml)
-1. Update the `repo` and `branch` to match your own location. In this example, I will modify the file to be:
+1. Update the `repo` and `branch` to match your own location. 
    ```yaml
    apiVersion: connectors.aiops.ibm.com/v1beta1
     kind: BundleManifest
@@ -86,7 +83,7 @@ git checkout -b github-connector-sample origin/github-connector-sample
    ```
    <podman or docker> push docker.io/<YourUsername>/sample-github-template:latest
    ```
-1. Update the image addresses in the Bundlemanifest files. First open [/bundle-artifacts/prereqs/kustomization.yaml](/bundle-artifacts/prereqs/kustomization.yaml). I replace:
+1. Update the image addresses in the Bundlemanifest files. In [/bundle-artifacts/prereqs/kustomization.yaml](/bundle-artifacts/prereqs/kustomization.yaml) and [/bundle-artifacts/connector/kustomization.yaml](/bundle-artifacts/connector/kustomization.yaml) replace the PLACEHOLDER_REGISTRY_ADDRESS with the path to your image in the docker repository.
    ```yaml
    newName: PLACEHOLDER_REGISTRY_ADDRESS/cp/aiopsedge/github-grpc-connector-template
    newTag: latest
@@ -101,7 +98,7 @@ git checkout -b github-connector-sample origin/github-connector-sample
    If your tag is not `latest`, update `newTag` as needed
 
 
-1. Commit the changes into GitHub into the `main` branch so the `bundlemanifest.yaml` will pickup the changes
+1. Commit the changes into GitHub into the `github-connector-sample` branch so the `bundlemanifest.yaml` will pickup the changes
 1. Next, prepare the OpenShift cluster to pull from the GitHub repository. Ensure you generate a GitHub token that can read from your code repository
      
     <a name="secret"></a>
@@ -132,13 +129,13 @@ git checkout -b github-connector-sample origin/github-connector-sample
     oc delete pod aiops-connections-ui-57dc845f75-zls5c
     ```
 
-1. In the CP4AIOps UI, you will now see an integration for Github gRPC Connector Template
-    ![integration](images/java-grpc-integration.png)
+1. In the CP4AIOps UI, you will now see an integration for `Github gRPC Connector Template`
+    ![integration](images/github-template\github-template-integration.png)
 
 # Development with Maven + Generating Images
 So how do you use maven in all of this?
 
-You can make modifications to the connector. For example, you can modify [ConnectorTemplate.java](src/main/java/com/ibm/aiops/connectors/template/ConnectorTemplate.java). You can also modify the test cases to add new unit tests.
+You can make modifications to the connector. For example, you can modify [TicketConnector.java](src/main/java/com/ibm/aiops/connectors/template/TicketConnector.java). You can also modify the test cases to add new unit tests.
 
 To verify the build and tests work, you would run:
 ```bash

@@ -1,4 +1,4 @@
-# Github Template Integration
+# Github Integration Template
 
 The github connector template is a snapshot of the AIOPS github integration. It has been renamed as `github-grpc-connector-template` so it can be installed with the existing `github` integration.
 

@@ -20,7 +20,7 @@ public class TicketConnectorFactory implements ConnectorFactory {
 
     @Override
     public String GetConnectorName() {
-        return "connector-github-template";
+        return "github-grpc-connector-template";
     }
 
     @Override
