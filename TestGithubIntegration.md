@@ -40,7 +40,7 @@ Choose `Promote alerts to an incident`
 
 Fill in the details and add github integration in the ticket section.
 
-![Policy 1](images/github-template/Policy1.png)
+![Policy 1](images/github-template/policy1.png)
 
 Click on Save button
 ![Policy 2](images/github-template/policy2.png)
