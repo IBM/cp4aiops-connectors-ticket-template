@@ -130,7 +130,7 @@ git checkout -b github-connector-sample origin/github-connector-sample
     ```
 
 1. In the CP4AIOps UI, you will now see an integration for `Github gRPC Connector Template`
-    ![integration](images/github-template\github-template-integration.png)
+    ![integration](images/github-template/github-template-integration.png)
 
 # Development with Maven + Generating Images
 So how do you use maven in all of this?
