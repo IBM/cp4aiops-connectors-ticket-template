@@ -185,6 +185,9 @@ CONNECTOR_BRIDGE_CLIENT_KEY=$(echo "${CONNECTOR_BRIDGE_SECRET}" | jq -r '.data["
 CONNECTOR_BRIDGE_HOST=$(echo "${CONNECTOR_BRIDGE_SECRET}" | jq -r '.data["external-host"]' | base64 --decode)
 CONNECTOR_BRIDGE_PORT=$(echo "${CONNECTOR_BRIDGE_SECRET}" | jq -r '.data["external-port"]' | base64 --decode)
 
+CONNECTOR_OAUTH_CLIENT_ID=$(echo "${CONNECTOR_OAUTH_SECRET}" | jq -r '.data["client-id"]' | base64 --decode)
+CONNECTOR_OAUTH_CLIENT_SECRET=$(echo "${CONNECTOR_OAUTH_SECRET}" | jq -r '.data["client-secret"]' | base64 --decode)
+
 
 echo -e " Server CA (place in /tmp/connector_ca.crt) " 
 echo "${CONNECTOR_BRIDGE_SERVER_CA}"
