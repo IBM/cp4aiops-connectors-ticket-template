@@ -81,7 +81,7 @@ spec:
       historical_config:
         additionalProperties: false
         properties:
-          collection_mode:
+          collectionMode:
             default: historical
             enum:
               - historical
@@ -90,7 +90,7 @@ spec:
             format: date-time
             type: string
         required:
-          - collection_mode
+          - collectionMode
           - start_date
         type: object  
       mappingsGithub:
@@ -225,7 +225,7 @@ spec:
           - "Live - Continuous Similar Tickets training"
           - "Historical - Initial Similar Tickets training"
         itemKeys: ["live", "historical"]
-        apiMapping: connection_config.collection_mode
+        apiMapping: connection_config.collectionMode
         formStep: collectTickets
         form:
           - id: live
