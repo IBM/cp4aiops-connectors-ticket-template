@@ -29,7 +29,7 @@ public class Configuration {
     protected String owner;
     protected String repo;
     protected String url;
-    protected String collectionMode;
+    protected String collection_mode;
     protected int issueSamplingRate;
     protected String mappingsGithub;
     protected String description;
@@ -37,5 +37,9 @@ public class Configuration {
 
     public String getToken() {
         return Utils.encode(token);
+    }
+
+    public String getCollectionMode() {
+        return collection_mode;
     }
 }
