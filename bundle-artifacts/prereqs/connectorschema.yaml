@@ -92,6 +92,7 @@ spec:
         required:
           - collectionMode
           - start_date
+          - datasource_type
         type: object  
       mappingsGithub:
         description: The incident creation mappings
@@ -132,12 +133,17 @@ spec:
       - step:
           id: fieldMapping
           name: "{{formSteps.fieldMapping}}"
-          isOptional: true
       - step:
           id: collectTickets
           name: "{{formSteps.collectTickets}}"
           isOptional: true
     form:
+      - id: type
+        element: input
+        type: hiddenText
+        defaultValue: tickets
+        apiMapping: connection_config.datasource_type
+        formStep: addConnection
       - id: name
         element: input
         type: text
