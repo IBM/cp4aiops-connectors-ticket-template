@@ -15,9 +15,9 @@ You can fill in any valid data.
 ![Integration 3](images/github-template/integration5.png)
 
 Press `Done`
-![Integration Table](images/github-template/integration-failed.png)
+![Integration Table](images/github-template/integration-instance-running.png)
 `Running` indicates that it is configured properly
-TODO: add an image with running
+
 
 ### Train the AI for Similar Incident and Change Risk
 Go to the AI management page
