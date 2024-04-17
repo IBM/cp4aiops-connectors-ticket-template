@@ -222,7 +222,7 @@ spec:
         labelOn: "On"
         headerLabel: "Define how ticket data is collected. Additional setup may be required before enabling data collection."
         headerLabelLink: https://ibm.biz/int-github
-        apiMapping: connection_config.dataFlow
+        apiMapping: connection_config.data_flow
         formStep: collectTickets
       - id: dynamic_schedule_form
         element: form
