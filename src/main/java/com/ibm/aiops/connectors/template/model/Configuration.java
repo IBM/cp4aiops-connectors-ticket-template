@@ -23,6 +23,7 @@ import lombok.ToString;
 @ToString(exclude = "token")
 public class Configuration {
     protected boolean data_flow = true;
+    protected String datasource_type = "tickets";
     // The historical start time since the epoch to begin collecting
     protected long start = 0;
     protected String token;
