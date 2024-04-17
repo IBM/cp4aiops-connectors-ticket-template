@@ -385,8 +385,8 @@ public class TicketConnector extends NotificationConnectorBase {
                 emitCloudEvent(ConnectorConstants.TOPIC_INPUT_LIFECYCLE_EVENTS, getPartition(), ce);
                 logger.log(Level.INFO, "Alert created: " + summary);
             }
-            logger.log(Level.INFO, "Sleeping for  " + seconds + " seconds");
-            TimeUnit.SECONDS.sleep(seconds);
+            logger.log(Level.INFO, "Sleeping for  " + seconds + " milliseconds");
+            TimeUnit.MILLISECONDS.sleep(seconds);
         } catch (JsonProcessingException | InterruptedException e1) {
             logger.log(Level.SEVERE, e1.getMessage(), e1);
         }
