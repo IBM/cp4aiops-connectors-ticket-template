@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ticket-template
+  name: github-sample
   labels:
-    app: ticket-template
+    app: github-sample
     connectors.aiops.ibm.com/restart-on-secret-changed: ""
 spec:
   selector:
     matchLabels:
-      app: ticket-template
+      app: github-sample
       instance: connector
   template:
     metadata:
       labels:
-        app: ticket-template
+        app: github-sample
         instance: connector
     spec:
       imagePullSecrets:
@@ -35,7 +35,7 @@ spec:
                     values:
                       - linux
       initContainers:
-        - image: ticket-template:unreleased-main-latest
+        - image: github-sample:unreleased-main-latest
           imagePullPolicy: Always
           name: cert-setup
           command:
@@ -65,9 +65,9 @@ spec:
             readOnlyRootFilesystem: false
             runAsNonRoot: true
       containers:
-        - image: ticket-template:unreleased-main-latest
+        - image: github-sample:unreleased-main-latest
           imagePullPolicy: Always
-          name: ticket-template
+          name: github-sample
           env:
             - name: POD_NAME
               valueFrom:
@@ -102,7 +102,28 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: bootstrapServers
-                  name: aiopsedge-kafka-application-secret                   
+                  name: aiopsedge-kafka-application-secret  
+            - name: URL_PREFIX
+              valueFrom:
+                configMapKeyRef:
+                  name: product-configmap
+                  key: URL_PREFIX
+            - name: ELASTIC_HOST
+              value: "iaf-system-elasticsearch-es.$(POD_NAMESPACE)"
+            - name: ELASTIC_PORT
+              value: "9200"       
+            - name: ELASTIC_BULK_INSERT_MAX_BATCH_SIZE
+              value: "100"           
+            - name: ELASTIC_BULK_INSERT_FLUSH_INTERVAL_SECONDS
+              value: "10"
+            - name: ELASTIC_BULK_INSERT_MIN_BATCH_SIZE
+              value: "3"
+            - name: ELASTIC_BULK_INSERT_CONCURRENT_REQUESTS
+              value: "1"
+            - name: ELASTIC_BULK_INSERT_BACKOFF_TIME_DELAY_SEC
+              value: "1"
+            - name: ELASTIC_BULK_INSERT_BACKOFF_MAX_TRIES
+              value: "3"
           ports:
             - containerPort: 9443
               name: metrics
@@ -144,14 +165,8 @@ spec:
             - mountPath: /etc/zeno/secrets/kafka
               name: kafka-secret-vol
             - name: elastic
-              mountPath: "/bindings/elastic/hostname"
-              subPath: host
-            - name: elastic
               mountPath: "/bindings/elastic/password"
               subPath: password
-            - name: elastic
-              mountPath: "/bindings/elastic/port"
-              subPath: port
             - name: elastic
               mountPath: "/bindings/elastic/username"
               subPath: username                                          
@@ -170,7 +185,7 @@ spec:
       volumes:
         - name: server-certs-raw
           secret:
-            secretName: ticket-template
+            secretName: github-sample
             defaultMode: 420
         - name: server-certs
           emptyDir: {}
@@ -212,5 +227,5 @@ spec:
                       path: metric-api-key
         - name: elastic
           secret:
-            secretName: ibm-aiops-es-aiops-user-connection-secret
+            secretName: cp4waiops-cartridge-es-auth
             defaultMode: 420

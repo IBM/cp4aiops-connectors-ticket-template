@@ -1,6 +1,6 @@
 apiVersion: connectors.aiops.ibm.com/v1beta1
 kind: MicroEdgeConfiguration
 metadata:
-  name: ticket-template
+  name: github-sample
 spec:
-  image: ticket-template
+  image: github-sample

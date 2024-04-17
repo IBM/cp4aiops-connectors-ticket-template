@@ -2,7 +2,7 @@
  *
  *      IBM Confidential
  *
- *      (C) Copyright IBM Corp. 2023
+ *      (C) Copyright IBM Corp. 2024
  *
  *      5737-M96
  *
@@ -20,7 +20,7 @@ public class TicketConnectorFactory implements ConnectorFactory {
 
     @Override
     public String GetConnectorName() {
-        return "connector-template";
+        return "github-sample";
     }
 
     @Override

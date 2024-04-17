@@ -1,9 +1,11 @@
 {
-    "collection_mode": "inference",
-    "data_flow": true,
+    "collectionMode": "historical2",
+    "data_flow": false,
     "end": 1701907199999,
-    "password": "pass",
     "start": 1701388800000,
-    "url": "https://example.com",
-    "username": "admin"
+    "token": "pass2",
+    "repo": "repo2",
+    "owner": "owner2",
+    "url": "https://example.com2",
+    "mappingsGithub": "mappings2"
 }

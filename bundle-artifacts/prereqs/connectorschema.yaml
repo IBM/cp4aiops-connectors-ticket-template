@@ -1,7 +1,7 @@
 apiVersion: connectors.aiops.ibm.com/v1beta1
 kind: ConnectorSchema
 metadata:
-  name: ticket-template
+  name: github-sample
   labels:
     tickets-connector: "true"
     notifications-connector: "true"
@@ -46,15 +46,17 @@ spec:
         operations:
           - read          
   encryptedFields:
-    - /password          
+    - /token          
   schema:
     allOf:
       - required:
           - url
+          - owner
+          - repo
+          - token
           - username
-          - password
     properties:
-      password:
+      token:
         format: secret
         type: string
       types:
@@ -63,6 +65,12 @@ spec:
         type: string
       username:
         type: string
+      owner:
+        type: string
+      repo:
+        type: string
+      issueSamplingRate:
+        type: integer
       datasource_type:
         default: tickets
         enum:
@@ -73,44 +81,41 @@ spec:
       historical_config:
         additionalProperties: false
         properties:
-          collection_mode:
+          collectionMode:
             default: historical
             enum:
               - historical
-            type: string
-          end_date:
-            format: date-time
             type: string
           start_date:
             format: date-time
             type: string
         required:
-          - collection_mode
+          - collectionMode
           - start_date
-          - end_date
+          - datasource_type
         type: object  
-      mapping:
-        additionalProperties:
-          type: string
-        type: object              
+      mappingsGithub:
+        description: The incident creation mappings
+        type: string            
     type: object
   uiSchema:
-    type: ticket-template
-    displayName: "Ticket Template"
-    iconFileType: png
-    iconFileSize: 96
+    type: github-sample
+    displayName: "Github Sample"
+    iconFileType: svg
     categories: 
-      - "{{connector.common.category.notifications}}"
-    url: https://www.ibm.com/docs/en/cloud-paks/cloud-pak-aiops
+      - "{{connector.common.category.tickets}}"
+    url: https://ibm.biz/int-github
     apiAdaptor: grpc
     datasourceType: tickets
-    sidePanelTitle: "{{sidePanel.title.servicenow}}"
-    sidePanelDescription: "{{connector.servicenow.sidepanel.description}}"
-    sidePanelInfoHeader: "{{sidePanel.information.header}}"
+    sidePanelTitle: "Github Sample"
+    sidePanelDescription: "{{integrations.sidePanel.github.description}}"
+    sidePanelInfoHeader: "{{integrations.sidePanel.github.information.header}}"
     sidePanelInfo:
-      - "{{common.egress_warning}}"
-      - "{{sidePanel.information.servicenow.1}}"
-      - "{{sidePanel.information.servicenow.2}}"
+      - "{{integrations.sidePanel.github.information.Row.1}}"
+      - "{{integrations.sidePanel.github.information.Row.2}}"
+      - "{{connector.github.form.username.label}}"
+      - "{{connector.github.form.owner.label}}"
+      - "{{connector.github.form.repo.label}}"
     hasOptionalConfig: true
     sidePanelOptionalConfigHeader: "{{sidePanel.optional.config.header}}"
     sidePanelOptionalConfigList:
@@ -118,9 +123,8 @@ spec:
     hasOptionalText: false
     hasAIModelType: true
     isObserver: false
-    deploymentType: ["local", "remote"]
+    deploymentType: ["local"]
     AIModelTypeList:
-      - "{{sidePanel.AIModelTypes.changeRisk}}"
       - "{{sidePanel.AIModelTypes.similarIncidents}}"
     formSteps:
       - step:
@@ -129,17 +133,22 @@ spec:
       - step:
           id: fieldMapping
           name: "{{formSteps.fieldMapping}}"
-          isOptional: true
       - step:
           id: collectTickets
           name: "{{formSteps.collectTickets}}"
           isOptional: true
     form:
+      - id: type
+        element: input
+        type: hiddenText
+        defaultValue: tickets
+        apiMapping: connection_config.datasource_type
+        formStep: addConnection
       - id: name
         element: input
         type: text
-        label: "{{connector.common.form.uniqueID.label}}"
-        placeholder: "{{connector.common.form.ops_integration_name.placeholder}}"
+        label: "Name"
+        placeholder: "Enter a name for this integration."
         apiMapping: connection_config.display_name
         formStep: addConnection
         isRequired: true
@@ -149,103 +158,120 @@ spec:
       - id: description
         element: input
         type: textarea
-        label: "{{connector.common.form.description.label}}"
-        placeholder: "{{connector.common.form.description.placeholder}}"
+        label: "Description (optional)"
+        placeholder: "Enter a description."
         apiMapping: connection_config.description
         formStep: addConnection
         maxCharLength: 600
       - id: url
         element: input
         type: text
-        label: "{{connector.servicenow.form.url.label}}"
-        placeholder: "{{connector.servicenow.form.url.placeholder}}"
-        helperText: "{{common.egress_warning}}"
+        label: "URL of GitHub server"
+        placeholder: "https://api.github.company.com"
+        helperText: "If you have any restrictive EgressNetworkPolicies in place, please ensure that they are updated to allow for this outbound integration."
         apiMapping: connection_config.url
         formStep: addConnection
         isRequired: true
         isURL : true
+      - id: token
+        element: input
+        type: password
+        label: "Personal access token for GitHub server"
+        placeholder: "Enter personal access token from GitHub"
+        helperText: "This token will be used to authenticate your requests to access GitHub APIs. Ensure to select 'repo' with 'full control of private repositories' scope. The owner of the token should have 'write' access to the repository."
+        apiMapping: connection_config.token
+        formStep: addConnection
+        isRequired: true
       - id: username
         element: input
         type: text
-        label: "{{connector.servicenow.form.user_id.label}}"
-        placeholder: "{{connector.common.form.username.placeholder}}"
+        label: "Username"
+        placeholder: "Enter username from GitHub."
         apiMapping: connection_config.username
         formStep: addConnection
+        maxCharLength: 600
         isRequired: true
-      - id: password
+      - id: owner
         element: input
-        type: password
-        label: "{{connector.common.form.password.label}}"
-        placeholder: "{{connector.common.form.password.placeholder}}"
-        apiMapping: connection_config.password
+        type: text
+        label: "Owner or organization"
+        placeholder: "Enter owner or organization of repository"
+        apiMapping: connection_config.owner
         formStep: addConnection
         isRequired: true
-      - id: orchestration
+      - id: repo
         element: input
-        type: radio
-        label: "{{connector.common.form.orchestration.label}}"
-        items: 
-          - "{{connection_form.dynamic_item.local}}"
-          - "{{connection_form.dynamic_item.remote}}"
-        itemKeys: ["local", "microedge"]
-        apiMapping: connection_config.deploymentType
+        type: text
+        label: "Repository"
+        placeholder: "Enter repository (where the issues are created)"
+        apiMapping: connection_config.repo
         formStep: addConnection
-      - id: connection_test
+        isRequired: true
+      - apiMapping: connection_config.deploymentType
         element: input
-        type: test
-        label: "{{connector.common.form.connection_test.label}}"
-        headerLabel: "{{connector.servicenow.form.mappingText.headerLabel}}"
         formStep: addConnection
-      - id: mapping
-        element: input
-        type: json
-        label: "{{connector.custom.form.mapping.label}}"
-        apiMapping: connection_config.mapping
-        formStep: fieldMapping
+        id: orchestration
+        type: hiddenText
+        defaultValue: local
       - id: data_flow
         element: input
         type: toggle
         defaultToggled: false
-        label: "{{connector.common.form.data_flow.label}}"
-        labelOff: "{{common.Off}}"
-        labelOn: "{{common.On}}"
-        headerLabel: "{{connector.common.form.ticketCollection.headerLabel}}"
-        apiMapping: connection_config.data_flow_ticket
+        label: "Data collection"
+        labelOff: "Off"
+        labelOn: "On"
+        headerLabel: "Define how ticket data is collected. Additional setup may be required before enabling data collection."
+        headerLabelLink: https://ibm.biz/int-github
+        apiMapping: connection_config.data_flow
         formStep: collectTickets
       - id: dynamic_schedule_form
         element: form
-        label: "{{common.mode}}"
+        label: "Mode"
         items: 
-          - "{{connection_form.dynamic_item.inference.tickets}}"
-          - "{{connection_form.dynamic_item.live.tickets}}"
-          - "{{connection_form.dynamic_item.historical.tickets}}"
-        itemKeys: ["inference", "live", "historical"]
-        apiMapping: connection_config.collection_mode
+          - "Live - Continuous Similar Tickets training"
+          - "Historical - Initial Similar Tickets training"
+        itemKeys: ["live", "historical"]
+        apiMapping: connection_config.collectionMode
         formStep: collectTickets
         form:
-          - id: inference
-            rows:
           - id: live
             rows:
+              - id: issueSamplingRate
+                element: input
+                type: number
+                label: "GitHub issue sampling rate (1-60 minutes)"
+                min: 1
+                max: 60
+                step: 1
+                defaultValue: 1
+                helperText: "The frequency at which data is sampled for GitHub issues (in minutes). The default value is 1."
+                apiMapping: connection_config.issueSamplingRate
+                formStep: collectTickets
+                isRequired: true
           - id: historical
             rows:
               - id: start
                 element: input
                 type: date
-                label: "{{connector.common.form.start_date.label}}"
-                placeholder: "{{connector.common.form.start_date.placeholder}}"
+                label: "Start date"
+                placeholder: "mm/dd/yyyy"
                 apiMapping: connection_config.start
-              - id: end
-                element: input
-                type: date
-                label: "{{connector.common.form.end_date.label}}"
-                placeholder: "{{connector.common.form.end_date.placeholder}}"
-                apiMapping: connection_config.end
-      - id: types
+                helperText: "Select a date to retrieve closed GitHub issues since their last updated time. Choosing a date further back may result in more API calls to GitHub especially if there is a large volume of issues."
+      - id: mappingsGithub
         element: input
-        type: text
-        label: "{{connector.servicenow.form.types.label}}"
-        placeholder: "{{connector.servicenow.form.types.placeholder}}"
-        helperText: "{{connector.servicenow.form.types.helperText}}"
-        apiMapping: connection_config.types
-        formStep: collectTickets
+        type: jsonata
+        headerLabel: "You can use the default issue template as-is, or customize it to include different information. In addition to the fields included by default, you can also specify 'state' and 'assignees' for the incident. A title is required or the issue cannot be created. The owner of the token should have push access to the repository to set 'labels' and 'assignees' for new issues. Changes to 'labels' and 'assignees' are silently dropped if the user does not have push access to the repository."
+        headerLabelLink: https://ibm.biz/int-github
+        label:  "Incident created GitHub issue"
+        isRequired: true
+        apiMapping: connection_config.mappingsGithub
+        formStep: fieldMapping
+        defaultValue: |
+          ({
+              "title": $string(incident.title),
+              "body": $join(["Incident Id:", $string(incident.id),
+                             "\nAIOPS Incident Overview URL: https://", $string(URL_PREFIX), "/aiops/default/resolution-hub/incidents/all/", $string(incident.id), "/overview",
+                             "\nStatus: ", $string(incident.state),
+                             "\nDescription: ", $string(incident.description)]),
+              "labels": [$join(["priority:", $string(incident.priority)])]
+          })
