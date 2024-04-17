@@ -10,6 +10,6 @@ configurations:
   - custom-images.yaml
 
 images:
-  - name: github-grpc-connector-template
-    newName: PLACEHOLDER_REGISTRY_ADDRESS/cp/aiopsedge/github-grpc-connector-template
+  - name: github-sample
+    newName: PLACEHOLDER_REGISTRY_ADDRESS/github-sample
     newTag: latest

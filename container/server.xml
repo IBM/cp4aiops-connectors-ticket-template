@@ -12,7 +12,7 @@
                 host="*"
                 httpsPort="9443"/>
 
-  <webApplication location="github-grpc-connector-template.war" contextRoot="/" />
+  <webApplication location="github-sample.war" contextRoot="/" />
 
   <!-- warning level logging for production -->
   <logging consoleFormat="simple" consoleSource="message,trace" consoleLogLevel="warning" traceFileName="stdout" traceFormat="BASIC" />

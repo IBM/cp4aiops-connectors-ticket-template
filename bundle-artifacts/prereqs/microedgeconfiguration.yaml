@@ -1,6 +1,6 @@
 apiVersion: connectors.aiops.ibm.com/v1beta1
 kind: MicroEdgeConfiguration
 metadata:
-  name: github-grpc-connector-template
+  name: github-sample
 spec:
-  image: github-grpc-connector-template
+  image: github-sample
