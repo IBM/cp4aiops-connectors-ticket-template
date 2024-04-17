@@ -30,7 +30,7 @@ public class ConnectorConstants {
     static final String TOPIC_INPUT_LIFECYCLE_EVENTS = "cp4waiops-cartridge.lifecycle.input.events";
 
     // Self identifier
-    public static final URI SELF_SOURCE = URI.create("template.connectors.aiops.ibm.com/github-grpc-connector-template");
+    public static final URI SELF_SOURCE = URI.create("template.connectors.aiops.ibm.com/github-sample");
     public static final String TICKET_TYPE = "github";
     static final String TOOL_TYPE_TICKET = "com.ibm.type.ticket." + TICKET_TYPE;
 

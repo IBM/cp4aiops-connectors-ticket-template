@@ -1,9 +1,9 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: github-grpc-connector-template
+  name: github-sample
   labels:
-    app: github-grpc-connector-template
+    app: github-sample
 spec:
   endpoints:
   - targetPort: metrics
@@ -21,5 +21,5 @@ spec:
       key: apikey
   selector:
     matchLabels:
-      app: github-grpc-connector-template
+      app: github-sample
       instance: connector

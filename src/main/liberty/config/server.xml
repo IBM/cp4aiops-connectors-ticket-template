@@ -12,7 +12,7 @@
         <feature>mpHealth-4.0</feature>
     </featureManager>
 
-    <webApplication location="github-grpc-connector-template.war" contextRoot="/" />
+    <webApplication location="github-sample.war" contextRoot="/" />
 
     <!-- To access this server from a remote client add a host attribute to the following element, e.g. host="*" -->
     <httpEndpoint id="defaultHttpEndpoint"

@@ -1,7 +1,7 @@
 apiVersion: connectors.aiops.ibm.com/v1beta1
 kind: ConnectorSchema
 metadata:
-  name: github-grpc-connector-template
+  name: github-sample
   labels:
     tickets-connector: "true"
     notifications-connector: "true"
@@ -99,7 +99,7 @@ spec:
         type: string            
     type: object
   uiSchema:
-    type: github-grpc-connector-template
+    type: github-sample
     displayName: "Github gRPC Connector Template"
     iconFileType: svg
     categories: 

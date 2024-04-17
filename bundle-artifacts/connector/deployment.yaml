@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: github-grpc-connector-template
+  name: github-sample
   labels:
-    app: github-grpc-connector-template
+    app: github-sample
     connectors.aiops.ibm.com/restart-on-secret-changed: ""
 spec:
   selector:
     matchLabels:
-      app: github-grpc-connector-template
+      app: github-sample
       instance: connector
   template:
     metadata:
       labels:
-        app: github-grpc-connector-template
+        app: github-sample
         instance: connector
     spec:
       imagePullSecrets:
@@ -35,7 +35,7 @@ spec:
                     values:
                       - linux
       initContainers:
-        - image: github-grpc-connector-template:unreleased-main-latest
+        - image: github-sample:unreleased-main-latest
           imagePullPolicy: Always
           name: cert-setup
           command:
@@ -65,9 +65,9 @@ spec:
             readOnlyRootFilesystem: false
             runAsNonRoot: true
       containers:
-        - image: github-grpc-connector-template:unreleased-main-latest
+        - image: github-sample:unreleased-main-latest
           imagePullPolicy: Always
-          name: github-grpc-connector-template
+          name: github-sample
           env:
             - name: POD_NAME
               valueFrom:
@@ -185,7 +185,7 @@ spec:
       volumes:
         - name: server-certs-raw
           secret:
-            secretName: github-grpc-connector-template
+            secretName: github-sample
             defaultMode: 420
         - name: server-certs
           emptyDir: {}

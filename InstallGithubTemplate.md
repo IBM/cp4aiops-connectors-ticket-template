@@ -1,6 +1,6 @@
 # Github Integration Template
 
-This page provides a complete end to end scenario to get the github integration template `github-grpc-connector-template` running in CP4AIOps.
+This page provides a complete end to end scenario to get the github integration template `github-sample` running in CP4AIOps.
 
 # Prerequisites
 - Podman (https://podman.io/docs/installation) or Rancher Desktop (https://rancherdesktop.io/)
@@ -44,7 +44,7 @@ git checkout -b github-connector-sample origin/github-connector-sample
    apiVersion: connectors.aiops.ibm.com/v1beta1
     kind: BundleManifest
     metadata:
-    name: github-grpc-connector-template
+    name: github-sample
     spec:
     prereqs:
         repo: 'https://github.com/<YourUsername>/cp4aiops-connectors-github-template'
@@ -85,7 +85,7 @@ git checkout -b github-connector-sample origin/github-connector-sample
    ```
 1. Update the image addresses in the Bundlemanifest files. In [/bundle-artifacts/prereqs/kustomization.yaml](/bundle-artifacts/prereqs/kustomization.yaml) and [/bundle-artifacts/connector/kustomization.yaml](/bundle-artifacts/connector/kustomization.yaml) replace the PLACEHOLDER_REGISTRY_ADDRESS with the path to your image in the docker repository.
    ```yaml
-   newName: PLACEHOLDER_REGISTRY_ADDRESS/cp/aiopsedge/github-grpc-connector-template
+   newName: PLACEHOLDER_REGISTRY_ADDRESS/cp/aiopsedge/github-sample
    newTag: latest
    ```
    
@@ -116,8 +116,8 @@ git checkout -b github-connector-sample origin/github-connector-sample
 
 1. Check if the connector was successfully configured (this may take a few seconds):
     ```bash
-    oc get BundleManifest | grep github-grpc-connector-template
-    github-grpc-connector-template    Configured
+    oc get BundleManifest | grep github-sample
+    github-sample    Configured
     ```
 
 1. Restart the `connections-ui` pod forcefully, or you can wait 5-10 minutes for it to auto refresh. Don't kill this pod if other people are using CP4AIOps:
@@ -150,9 +150,9 @@ To build an updated image, you would do (replace with your own image repository)
 
 Once the image is pushed to your repository, then you can restart the pod:
 ```bash
-oc get pods | grep github-grpc-connector-template
-github-grpc-connector-template-49445af7-ef2a-4692-b564-636a354bgq   1/1     Running                  0              12m
-oc delete pod github-grpc-connector-template-49445af7-ef2a-4692-b564-636a354bgq
+oc get pods | grep github-sample
+github-sample-49445af7-ef2a-4692-b564-636a354bgq   1/1     Running                  0              12m
+oc delete pod github-sample-49445af7-ef2a-4692-b564-636a354bgq
 ```
 
 The new pod that starts up will pull the latest image.
@@ -256,7 +256,7 @@ com.ibm.ws.logging.trace.specification="*=warning:com.ibm.aiops.connectors.*=all
 
 
 
-Next go the `Deployments` and look for the integration. For example, mine is `github-grpc-connector-template-537328bf-192a-457d-b0c7-9ebc41641c9a` (part of the `uuid` is used as the suffix, the rest is padded by OpenShift, so searching for the first couple of letters of the `uuid` is the easiest way)
+Next go the `Deployments` and look for the integration. For example, mine is `github-sample-537328bf-192a-457d-b0c7-9ebc41641c9a` (part of the `uuid` is used as the suffix, the rest is padded by OpenShift, so searching for the first couple of letters of the `uuid` is the easiest way)
 
 Open the yaml and set the `replica` to 0:
 ```yaml
