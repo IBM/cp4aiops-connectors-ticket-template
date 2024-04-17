@@ -100,14 +100,14 @@ spec:
     type: object
   uiSchema:
     type: github-sample
-    displayName: "Github gRPC Connector Template"
+    displayName: "Github Sample"
     iconFileType: svg
     categories: 
       - "{{connector.common.category.tickets}}"
     url: https://ibm.biz/int-github
     apiAdaptor: grpc
     datasourceType: tickets
-    sidePanelTitle: "Github gRPC Connector Template"
+    sidePanelTitle: "Github Sample"
     sidePanelDescription: "{{integrations.sidePanel.github.description}}"
     sidePanelInfoHeader: "{{integrations.sidePanel.github.information.header}}"
     sidePanelInfo:
