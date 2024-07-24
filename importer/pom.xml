@@ -12,8 +12,8 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
     <elastic.version>7.17.16</elastic.version>
     <jackson.version>2.16.1</jackson.version>
     <jackson-databind.version>2.16.1</jackson-databind.version>
@@ -50,11 +50,6 @@
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
       <version>${jackson-databind.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.ibm.cp4waiops.connectors</groupId>
-      <artifactId>connectors-sdk</artifactId>
-      <version>2.1.2</version> <!-- CONNECTOR_SDK_VERSION -->
     </dependency>
   </dependencies>
 
