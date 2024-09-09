@@ -31,8 +31,9 @@ public class JSONImporter
 
         DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
+        ElasticHelper elasticHelper = null;
         try {
-            ElasticHelper elasticHelper = new ElasticHelper();
+            elasticHelper = new ElasticHelper();
 
             if (jsonString != null) {
                 // Parse the JSON string
@@ -99,17 +100,51 @@ public class JSONImporter
         catch (Exception e)   {
             e.printStackTrace();
         }
+        finally {
+            try {
+                if (elasticHelper != null){
+                    if (elasticHelper.closeBulkProcessor()){
+                        // The BulkProcessor appears to have threads that aren't closed,
+                        // since the program does not terminate without it. If we verify
+                        // the BulkProcessor has closed sucessfully, exit the program 
+                        // sucessfully to avoid a hang
+                        System.exit(0);
+                    }
+                }
+            }
+            catch (Exception e){
+                // Do nothing
+            }
+        }
     }
 
     private static String readResourceFile(String fileName) {
         ClassLoader classLoader = JSONImporter.class.getClassLoader();
-        try (InputStream inputStream = classLoader.getResourceAsStream(fileName);
-             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
-
+        InputStream inputStream = null;
+        BufferedReader reader = null;
+        try {
+            inputStream = classLoader.getResourceAsStream(fileName);
+            reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
             return reader.lines().collect(Collectors.joining(System.lineSeparator()));
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+        finally {
+            try {
+                if (inputStream != null){
+                    inputStream.close();
+                }
+            } catch (Exception e){
+                // Do nothing
+            }
+            try {
+                if (reader != null){
+                    reader.close();
+                }
+            } catch (Exception e){
+                // Do nothing
+            }
         }
     }
 }

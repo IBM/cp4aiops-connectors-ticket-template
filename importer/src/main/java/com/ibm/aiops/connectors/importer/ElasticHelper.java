@@ -51,7 +51,7 @@ public class ElasticHelper {
     private static final int BACKOFF_MAX_TRIES = Integer
             .parseInt(System.getenv().getOrDefault("SEARCH_BULK_INSERT_BACKOFF_MAX_TRIES", "3"));
     private static final int CLOSE_BULK = Integer
-            .parseInt(System.getenv().getOrDefault("SEARCH_BULK_CLOSE_PROCESSOR", "1"));
+            .parseInt(System.getenv().getOrDefault("SEARCH_BULK_CLOSE_PROCESSOR", "5"));
 
     public String DIRECT_TO_SEARCH_PASSWORD = System.getenv().getOrDefault("DIRECT_TO_SEARCH_PASSWORD", "");
     public String DIRECT_TO_SEARCH_HOSTNAME = System.getenv().getOrDefault("DIRECT_TO_SEARCH_HOSTNAME", "");
@@ -176,12 +176,13 @@ public class ElasticHelper {
         this.bulkProcessor.add(indexRequest);
     }
 
-    public void closeBulkProcessor() {
+    public boolean closeBulkProcessor() {
         try {
-            logger.log(Level.INFO, "Closing Bulk process in " + CLOSE_BULK + TimeUnit.MINUTES);
-            this.bulkProcessor.awaitClose(CLOSE_BULK, TimeUnit.MINUTES);
+            logger.log(Level.INFO, "Closing Bulk process in " + CLOSE_BULK + " " + TimeUnit.SECONDS);
+            return this.bulkProcessor.awaitClose(CLOSE_BULK, TimeUnit.SECONDS);
         } catch (Exception ex) {
             logger.log(Level.WARNING, "Couldn't stop bulk processor", ex);
         }
+        return false;
     }
 }
