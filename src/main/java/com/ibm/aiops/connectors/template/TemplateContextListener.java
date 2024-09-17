@@ -2,7 +2,7 @@
  *
  *      IBM Confidential
  *
- *      (C) Copyright IBM Corp. 2023
+ *      (C) Copyright IBM Corp. 2024
  *
  *      5737-M96
  *
@@ -13,10 +13,10 @@ package com.ibm.aiops.connectors.template;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.inject.Inject;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-import javax.servlet.annotation.WebListener;
+import jakarta.inject.Inject;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
+import jakarta.servlet.annotation.WebListener;
 
 import com.ibm.cp4waiops.connectors.sdk.ConnectorManager;
 import com.ibm.cp4waiops.connectors.sdk.SDKCheck;

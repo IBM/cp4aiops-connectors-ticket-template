@@ -11,8 +11,8 @@ RUN cd /build/connector && rm -r src/main/liberty && mvn install
 
 ## Final image
 FROM --platform=linux/amd64 icr.io/appcafe/websphere-liberty:23.0.0.12-kernel-java11-openj9-ubi
-ARG VERBOSE=true
-ENV LICENSE=accept
+# ARG VERBOSE=true
+# ENV LICENSE=accept
 
 USER 0
 RUN dnf install -y procps-ng && dnf clean all
@@ -26,7 +26,7 @@ COPY --chown=1001:0 container/jvm.options /config/
 COPY --chown=1001:0  container/server.xml /config/
 RUN features.sh && configure.sh
 
-COPY --from=builder --chown=1001:0 /build/connector/target/ticket-template.war /config/apps/
+COPY --from=builder --chown=1001:0 /build/connector/target/github-sample.war /config/apps/
 
 USER 1001
 

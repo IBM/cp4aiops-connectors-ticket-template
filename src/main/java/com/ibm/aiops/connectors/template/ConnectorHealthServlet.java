@@ -3,7 +3,7 @@
  *
  *      IBM Confidential
  *
- *      (C) Copyright IBM Corp. 2023
+ *      (C) Copyright IBM Corp. 2024
  *
  *      5737-M96
  *
@@ -14,12 +14,12 @@ package com.ibm.aiops.connectors.template;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-import javax.inject.Inject;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.inject.Inject;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Required for health checks when being deployed. These health checks are used in the BundleManifests's deployment.yaml

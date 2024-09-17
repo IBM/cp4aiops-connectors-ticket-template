@@ -3,7 +3,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.ibm.aiops.connectors.event-template</groupId>
-  <artifactId>ticket-template</artifactId>
+    <artifactId>github-sample</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>war</packaging>
   <properties>
@@ -28,13 +28,13 @@
     <dependency>
       <groupId>jakarta.platform</groupId>
       <artifactId>jakarta.jakartaee-api</artifactId>
-      <version>8.0.0</version>
+      <version>9.1.0</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.eclipse.microprofile</groupId>
       <artifactId>microprofile</artifactId>
-      <version>4.1</version>
+      <version>5.0</version>
       <type>pom</type>
       <scope>provided</scope>
     </dependency>
@@ -42,7 +42,7 @@
     <dependency>
       <groupId>com.ibm.cp4waiops.connectors</groupId>
       <artifactId>connectors-sdk</artifactId>
-      <version>1.7.5</version> <!-- CONNECTOR_SDK_VERSION -->
+      <version>2.0.0</version> <!-- CONNECTOR_SDK_VERSION -->
     </dependency>
 
     <!-- CloudEvent object and associated builder -->
@@ -56,6 +56,12 @@
         <artifactId>json</artifactId>
         <version>20231013</version>
     </dependency>
+    <!-- JSONata -->
+    <dependency>
+        <groupId>com.ibm.jsonata4java</groupId>
+	<artifactId>JSONata4Java</artifactId>
+        <version>2.4.3</version>
+    </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
@@ -65,7 +71,7 @@
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <version>3.8.0</version>
+      <version>5.11.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -93,7 +99,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.22.2</version>
+        <version>3.0.0-M5</version>
         <configuration>
           <systemPropertyVariables>
             <java.util.logging.config.file>src/test/resources/logging.properties</java.util.logging.config.file>
