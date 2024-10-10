@@ -176,29 +176,6 @@ You will get the output (made pretty for readability):
 
 # JSONImporterChangeRequest
 
-
-## Change Risk Schema
-Change Risk
-| Name   |      Description    | Type  |  Example(s) |
-|----------|:-------------:|:-------------:|------:|
-| sys_id |  Unique identifier in the ITSM system | String | 20de36ec73d423002728660c4cf6a7d6 |
-| number |    A human readable identifier |String|  CHG0002001 |
-| assigned_to | Who the change request is assigned to | String |   Bob Stevens |
-| sys_created_by | Who the change request was created by | String |   Paul Brown |
-| sys_domain | What domain this change falls into. Different domains are separated | String |   global |
-| business_service | What business service owns the change request | String |   Retail |
-| type | What type of change request type | String | Emergency or Normal   |
-| state | What type of change request state. The state must be Closed for the change request to be used for training | String | Closed, Canceled, or New    |
-| short_description | A short summary of the change request | String | Update server from 10.0 to 10.1    |
-| impact | The impact of the change request | String | 3 - Low, 2 - Medium, or 1 - High    |
-| reason | The reason for the change request | String | Security fix    |
-| justification | The impact of the change request | String | Server requires critical security update from the upgrade    |
-| description | The description of the change request | String | Server name is example and the finance team needs to be notified one day before it goes offline    |
-| backout_plan | The backout plan in case change request fails | String | Undo the upgrade from 10.1 to 10.0    |
-| close_code | The close code of the change request. Must be Successful, Successful with issues, or Unsuccessful | String | Successful, Successful with issues, or Unsuccessful    |
-| close_notes | The close notes | String | Implemented   |
-| closed_at | The date and time that it is closed  | String | 2023-01-24 13:07:15   |
-
 ## Port Forward Elastic
 Login to OpenShift
 
@@ -249,33 +226,7 @@ curl -X POST --user $EL_USER:$EL_PWD https://localhost:9201/snowchangerequest/_c
 {"count":15,"_shards":{"total":1,"successful":1,"skipped":0,"failed":0}}%    
 ```
 
-Note: to prevent the error in the pod `precheck`
-
-```
-"Insufficient number of problematic change tickets for a good model. For a closed change ticket count less or equal to 150, you need at least 3 problematic tickets. For a closed change ticket count greater than 150, you need at least 2 percent of change tickets to be problematic. A problematic change ticket is defined as a change ticket that can either be associated with incident tickets or have an 'unsuccessful' value set in the change ticket close code field."
-```
-
-Make sure your data has the correct number of `Unsuccessful ` close codes
-
-Once the data for change request is in, you also need the incidents trained from before. If there are no incidents, change risk training is required. If you had not inserted the incident training data before, make sure to do it now.
-
-After, you can run:
+You can query for a particular record (for example, querying `sysid02` for aggregated close notes):
 ```bash
-oc get secret kafka-secrets -o "jsonpath={.data['ca\.crt']}" | base64 -d > ca.crt
-export KAFKA_USER=`oc get secret kafka-secrets -o go-template --template="{{.data.user|base64decode}}"`
-export KAFKA_PWD=`oc get secret kafka-secrets -o go-template --template="{{.data.password|base64decode}}"`
-export KAFKA_BOOTSTRAP=`oc get routes iaf-system-kafka-bootstrap -o=jsonpath='{.status.ingress[0].host}{"\n"}'`
-```
-
-The `input.json` is in the same directory as this `README.md`. Also you need kcat (https://docs.confluent.io/platform/current/tools/kafkacat-usage.html). Run:
-```bash
-kcat -X security.protocol=SASL_SSL -X ssl.ca.location=ca.crt -X sasl.mechanisms=SCRAM-SHA-512 -X sasl.username=$KAFKA_USER -X sasl.password=$KAFKA_PWD -b $KAFKA_BOOTSTRAP:443 -P -t cp4waiops-cartridge.changerequest -P input.json
-```
-
-Feel free to modify `input.json` to match your data.
-
-Open the pod with prefix `aimanager-aio-change-risk` to see:
-```log
-2024-10-03 20:58:38 Posting high-risk event to cp4waiops-cartridge.lifecycle.input.events: {"id": "4bd051b0-a210-489f-892e-ace5be32a4a2", "sender": {"service": "change-risk-service", "name": "change-risk", "type": "change-risk"}, "resource": {"name": "", "sourceId": "CHG0030003", "type": "change-request"}, "type": {"classification": "change risk analysis", "condition": "Confidence 53%", "eventType": "problem"}, "severity": 3, "summary": "High-risk change CHG0030003", "details": {"body_html": "IBM Cloud Pak for AIOps has detected that this change request is at [code]<b>HIGH RISK</b>[/code]. \n\n Confidence: [code]<b>53%</b>[/code] \n\n [code]<b>Most relevant change requests</b>[/code]: \n\n[code]<a href='https://example.com/change_request.do?sysparm_query=number=chg05'>chg05</a> was closed as being unsuccessful. The closing remarks of the change ticket were :'Chair was still squeaky. Chair was tossed into the trash'.[/code] \n\n [code]<a href='https://example.com/change_request.do?sysparm_query=number=chg15...
-2024-10-03 20:58:38 Broadcasted message to topic cp4waiops-cartridge.lifecycle.input.events at offset: 0
+curl -X GET --user $EL_USER:$EL_PWD https://localhost:9201/snowchangerequest/_search --header 'Content-Type: application/json' --data '{"query" : {"match" : { "sys_id" : "sysid02" }}}' -k 
 ```

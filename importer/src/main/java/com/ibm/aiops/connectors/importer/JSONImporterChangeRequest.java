@@ -1,7 +1,6 @@
 package com.ibm.aiops.connectors.importer;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -11,10 +10,12 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ibm.aiops.connectors.importer.models.TicketExtended;
 import com.ibm.cp4waiops.connectors.sdk.models.Ticket;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
 
 /**
  * Imports incident data into AIOps
@@ -27,9 +28,12 @@ public class JSONImporterChangeRequest
 
     public static void main(String[] args) {
         // Read the file from resources folder
-        String jsonString = readResourceFile("sampleChange.json");
+        String jsonString = readResourceFile("sampleChangeMultipleCloseNotes.json");
 
         DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+        // HashMap
+        HashMap<String,TicketExtended> changeRequestMaps = new HashMap<String,TicketExtended>();
 
         ElasticHelper elasticHelper = null;
         try {
@@ -41,6 +45,8 @@ public class JSONImporterChangeRequest
 
                 int len = jsonArr.length();
                 int validEntries = 0;
+                // Iterate and combine all close notes together. Change requests can have more than
+                // one identifier with different close notes
                 for (int i=0; i<len; i++){
                     JSONObject jsonObject = jsonArr.getJSONObject(i);
 
@@ -50,7 +56,10 @@ public class JSONImporterChangeRequest
                     try {
                         JSONObject normalizedJSON = new JSONObject();
 
-                        normalizedJSON.put("sys_id", jsonObject.getString("sys_id"));
+                        String current_sys_id = jsonObject.getString("sys_id");
+                        String current_close_notes = jsonObject.getString("close_notes");
+
+                        normalizedJSON.put("sys_id", current_sys_id);
                         normalizedJSON.put("number", jsonObject.getString("number"));
                         normalizedJSON.put("assigned_to", jsonObject.getString("assigned_to"));
                         normalizedJSON.put("sys_created_by", jsonObject.getString("sys_created_by"));
@@ -65,19 +74,35 @@ public class JSONImporterChangeRequest
                         normalizedJSON.put("description", jsonObject.getString("description"));
                         normalizedJSON.put("backout_plan", jsonObject.getString("backout_plan"));
                         normalizedJSON.put("close_code", jsonObject.getString("close_code"));
-                        normalizedJSON.put("close_notes", jsonObject.getString("close_notes"));
+                        normalizedJSON.put("close_notes", current_close_notes);
                         normalizedJSON.put("closed_at", jsonObject.getString("closed_at"));
 
                         ObjectMapper om = new ObjectMapper();
-                        Ticket myTicket = om.readValue(normalizedJSON.toString(), Ticket.class);
+                        TicketExtended myTicket = om.readValue(normalizedJSON.toString(), TicketExtended.class);
 
-                        elasticHelper.insertIntoElastic(myTicket.getHashMap(), INCIDENT_INDEX);
-                        validEntries++;
+                        if (changeRequestMaps.containsKey(current_sys_id)){
+                            // If another change request was found with the same id, aggregate the close notes
+                            String closeNotes = changeRequestMaps.get(current_sys_id).getClose_notes();
+                            closeNotes += "\n" + current_close_notes;
+                            
+                            myTicket.setClose_notes(closeNotes);
+                            changeRequestMaps.remove(current_sys_id);
+                        }
 
+                        changeRequestMaps.put(current_sys_id, myTicket);
                     } catch (Exception e){
                         System.out.println("Ignored id " + id + " due to " + e.getMessage());
                     }
                 }
+
+                // Iterate through just the hashmap to insert into elastic
+                // Close notes have been aggregated together
+                for (HashMap.Entry<String, TicketExtended> set :
+                    changeRequestMaps.entrySet()) {
+                    elasticHelper.insertIntoElastic(set.getValue().getHashMap(), INCIDENT_INDEX);
+                    validEntries++;                                    
+                }
+
                 System.out.println("Valid change requests to insert: "  + validEntries);
             }
         }
