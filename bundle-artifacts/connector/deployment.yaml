@@ -30,6 +30,7 @@ spec:
                     values:
                       - amd64
                       - ppc64le
+                      - s390x 
                   - key: kubernetes.io/os
                     operator: In
                     values:
@@ -102,7 +103,24 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: bootstrapServers
-                  name: aiopsedge-kafka-application-secret                   
+                  name: aiopsedge-kafka-application-secret
+            - name: URL_PREFIX
+              valueFrom:
+                  configMapKeyRef:
+                    name: product-configmap
+                    key: URL_PREFIX
+            - name: SEARCH_BULK_INSERT_MAX_BATCH_SIZE
+              value: "100"           
+            - name: SEARCH_BULK_INSERT_FLUSH_INTERVAL_SECONDS
+              value: "10"
+            - name: SEARCH_BULK_INSERT_MAX_SIZE_MB
+              value: "3"
+            - name: SEARCH_BULK_INSERT_CONCURRENT_REQUESTS
+              value: "1"
+            - name: SEARCH_BULK_INSERT_BACKOFF_TIME_DELAY_SEC
+              value: "1"
+            - name: SEARCH_BULK_INSERT_BACKOFF_MAX_TRIES
+              value: "3"                 
           ports:
             - containerPort: 9443
               name: metrics
@@ -110,11 +128,11 @@ spec:
           resources:
             requests:
               cpu: 200m
-              memory: 400Mi
+              memory: 500Mi
               ephemeral-storage: "0"
             limits:
               cpu: "1"
-              memory: 512Mi
+              memory: 800Mi
               ephemeral-storage: 1Gi
           livenessProbe:
             httpGet:
@@ -143,18 +161,21 @@ spec:
               mountPath: /config/configDropins/overrides/
             - mountPath: /etc/zeno/secrets/kafka
               name: kafka-secret-vol
-            - name: elastic
-              mountPath: "/bindings/elastic/hostname"
-              subPath: host
-            - name: elastic
-              mountPath: "/bindings/elastic/password"
+            - name: search
+              mountPath: "/bindings/search/password"
               subPath: password
-            - name: elastic
-              mountPath: "/bindings/elastic/port"
+            - name: search
+              mountPath: "/bindings/search/username"
+              subPath: username
+            - name: search
+              mountPath: "/bindings/search/host"
+              subPath: host
+            - name: search
+              mountPath: "/bindings/search/port"
               subPath: port
-            - name: elastic
-              mountPath: "/bindings/elastic/username"
-              subPath: username                                          
+            - name: search
+              mountPath: "/bindings/search/opensearch"
+              subPath: opensearch
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -210,7 +231,8 @@ spec:
                   items:
                     - key: apikey
                       path: metric-api-key
-        - name: elastic
+        - name: search
           secret:
-            secretName: ibm-aiops-es-aiops-user-connection-secret
+            secretName: AIOPS-DYNAMIC-REPLACE-ELASTICSEARCHSECRETNAME
             defaultMode: 420
+            optional: true
