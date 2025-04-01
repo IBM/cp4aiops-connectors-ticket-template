@@ -1,12 +1,11 @@
 # Ticket Integration Template
-This generic ticket template generates dummy data that can train Similar Incident and Change Risk AI models.
+This generic ticket template generates dummy data that can train Similar Incident by polling the data from outbound system. Also it can create, update and close incidents in outbound system by listenting to the incident actions from AIOps. 
 
-A quick start guide to customizing the connector name, building the image, and running compare the branches via: https://github.com/IBM/cp4aiops-connectors-ticket-template/compare/sample01?expand=1
-
-For a quick start to begin development, see the explanation via: https://github.com/IBM/cp4waiops-connectors-java-template/blob/main/SampleSetup.md
+## How to use this template
+```[UsingTicketingTemplate](UsingTicketingTemplate.md)```
 
 ## Architecture
-![Architecture](images/ticket-architecture4.3.jpg)
+![Architecture](images/ticket-architecture4.3_v1.1.jpg)
 
 Note: all pod names are prefixes, OpenShift and the conenctor framework deployments will add suffixes to make them unique
 
@@ -255,8 +254,6 @@ onAction with type=com.ibm.sdlc.snow.comment.create and data={"specversion":"1.0
 ## Files
 - `bundle-artifacts` folder: contains the yaml files for deploying to Kubernetes
 - `bundlemanifest.yaml`: the file used to install the connector into CP4AIOps
-- `src/main`: the Java files for the integration. This integration is built using Liberty and Maven
-- `src/test`: example Java JUnit files
 
 ### Configuration
 
@@ -312,8 +309,6 @@ export SERVICE_BINDING_ROOT=<root directory>; mvn liberty:run
 ## Question and Answer
 
 1. How should I get started?
-For customizing your integration, a very detailed example of customizing a integration can be found in another sample: https://github.com/IBM/cp4waiops-connectors-java-template/blob/main/SampleSetup.md. The same concepts apply to this integration.
-
 In `TicketConnector`'s class, the `onAction` and `onConfiguration` are the two methods you should start with.
 
 `onConfiguration` reads the properties set by the user from the AIOPs UI. Your incident management system (ITSM) may require URL and a token, which you need to read from here.
@@ -326,11 +321,9 @@ For "historical" data, you want to query the date range specified by the user. Y
 
 2. Why don't we use the Flink framework like the Service Now connector? The Flink framework hard codes Service Now as the connector type. This means any new connector created for ticketing cannot use it. As a result, data is inserted directly into elastic and Flink isn't used. The batching used in Flink for increasing performance was copied
 
-3. Why `connection_config.data_flow_ticket` instead of `connection_config.data_flow`? `connection_config.data_flow` is a special property in the AIOPs UI that tries to start a Flink job. For the ticket connectors, it will bypass the Flink job and insert directly into elastic, so this property cannot be used.
+3. How should I get new data from the data source? Due to limitations with FIPs in combination with Liberty and gRPC, the ticket connectors should get live and inference data by polling the data source. If you set setup a webhook, that requires an incoming connection, which is not FIPs compliant. FIPs compliance was enforced by only allowing outgoing connections.
 
-4. How should I get new data from the data source? Due to limitations with FIPs in combination with Liberty and gRPC, the ticket connectors should get live and inference data by polling the data source. If you set setup a webhook, that requires an incoming connection, which is not FIPs compliant. FIPs compliance was enforced by only allowing outgoing connections.
-
-5. How do I reset AI training?
+4. How do I reset AI training?
 First delete the AI models for Similar Incident or Change Risk
 ![AI Model](images/AIModelDelete01.png)
 ![AI Model](images/AIModelDelete02.png)
@@ -395,15 +388,3 @@ kcat -X security.protocol=SASL_SSL -X ssl.ca.location=ca.crt -X sasl.mechanisms=
   Offset: %o
   Headers: %h\n'
 ```
-
-6. The integration cannot find the Elastic credentials so insertion into Elastic fails. The Elastic credentials are stored in a file that can have a different name based on your installation. 
-
-In `bundle-artifacts/connector/deployment` the following secret is used:
-```yaml
-        - name: elastic
-          secret:
-            secretName: ibm-aiops-es-aiops-user-connection-secret
-            defaultMode: 420
-
-```
-Replace the `secretName` with `<installation-name>-es-aiops-user-connection-secret`
