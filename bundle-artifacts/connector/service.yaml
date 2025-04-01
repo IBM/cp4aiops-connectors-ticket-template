@@ -3,6 +3,7 @@ kind: Service
 metadata:
   name: java-grpc-conn-template
   annotations:
+    connectors.aiops.ibm.com/cert-create-enabled: "true"
     service.beta.openshift.io/serving-cert-secret-name: ticket-template
   labels:
     app: ticket-template

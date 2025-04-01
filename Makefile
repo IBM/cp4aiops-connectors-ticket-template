@@ -1,4 +1,4 @@
-REGISTRY ?= docker-na-public.artifactory.swg-devops.com/hyc-connector-framework-team-integrations-docker-local
+REGISTRY ?= PLACEHOLDER_REGISTRY_ADDRESS
 TAG ?= latest
 
 IMAGE := $(REGISTRY)/cp/aiopsedge/cp4waiops-connector-ticket-template:$(TAG)
