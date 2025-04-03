@@ -41,7 +41,7 @@ IssuePollingAction -> To pull the data from the ticketing system.
 - Go to AIOps UI -> Integrations UI
 ![Integrations UI](images/IntegrationsUI.png)
 - Click on add integration, search for Ticket Template or by the display name ```spec.uiSchema.displayName``` you specified in [connectorschema.yaml](bundle-artifacts/prereqs/connectorschema.yaml) file and you should see a tile as Ticket Template.
-- Select it, try to add an integration. You can select url as `https://api.github.ibm.com/repos/githubowner/yourreponame/issues` and provide your github token. 
+- Select it, try to add an integration. You can select url as `https://api.github.com/repos/githubowner/yourreponame/issues` and provide your github token. 
 - Once you save the integration, first it goes to Initializing, then Running after.
 - Once the integration is Running. Go to `createIncident.md`. Trigger the incidents as specified in this file.
 - If your integrations is in "unknown" status. Check the pod status in OpenShift console, if it says imagepullerror. Try to edit `pull-secret` as key/value pair in Secrets. Add Registry server address, Username and Password.

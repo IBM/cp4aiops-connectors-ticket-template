@@ -35,7 +35,7 @@ vars:
 patches:
 - patch: |-
     - op: replace
-      path: /spec/template/spec/volumes/5/secret/secretName
+      path: /spec/template/spec/volumes/4/secret/secretName
       value: AIOPS-DYNAMIC-REPLACE-ELASTICSEARCHSECRETNAME
   target:
     kind: Deployment
