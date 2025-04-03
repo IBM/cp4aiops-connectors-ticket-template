@@ -77,33 +77,7 @@ spec:
             - name: POD_NAMESPACE
               valueFrom:
                 fieldRef:
-                  fieldPath: metadata.namespace
-            - name: KAFKA_SCRAM_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  key: user
-                  name: aiopsedge-kafka-application-secret
-            - name: KAFKA_SCRAM_PASSWORD_PATH
-              value: /etc/zeno/secrets/kafka/password
-            - name: KAFKA_TRUSTSTORE_PATH
-              value: /etc/zeno/secrets/kafka/truststore.jks
-            - name: KAFKA_TRUSTSTORE_PASSWORD_PATH
-              value: /etc/zeno/secrets/kafka/truststore.password
-            - name: KAFKA_PROD_ACKS
-              value: "1"
-            - name: KAFKA_PROD_BATCH_SIZE
-              value: "16384"
-            - name: KAFKA_PROD_LINGER_MS
-              value: "10"
-            - name: KAFKA_PROD_COMPRESSION_TYPE
-              value: "none"    
-            - name: KAFKA_PROD_BUFFER_MEMORY
-              value: "33554432"                                      
-            - name: KAFKA_BOOTSTRAP_SERVERS
-              valueFrom:
-                secretKeyRef:
-                  key: bootstrapServers
-                  name: aiopsedge-kafka-application-secret
+                  fieldPath: metadata.namespace                                   
             - name: URL_PREFIX
               valueFrom:
                   configMapKeyRef:
@@ -159,8 +133,6 @@ spec:
               mountPath: /bindings/grpc-bridge
             - name: config-overrides
               mountPath: /config/configDropins/overrides/
-            - mountPath: /etc/zeno/secrets/kafka
-              name: kafka-secret-vol
             - name: search
               mountPath: "/bindings/search/password"
               subPath: password
@@ -196,11 +168,7 @@ spec:
         - name: server-certs
           emptyDir: {}
         - name: config-overrides
-          emptyDir: {}
-        - name: kafka-secret-vol
-          secret:
-            defaultMode: 420
-            secretName: aiopsedge-kafka-application-secret          
+          emptyDir: {}       
         - name: grpc-bridge-service-binding
           projected:
             sources:
