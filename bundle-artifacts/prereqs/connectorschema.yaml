@@ -3,48 +3,31 @@ kind: ConnectorSchema
 metadata:
   name: ticket-template
   labels:
-    tickets-connector: "true"
-    notifications-connector: "true"
+    aiops-connector-category-ticketing: "true" # For integration to appear under Ticketing section in policy. Use notifications-connector: "true" instead for it to be under Notifications. 
 spec:
   categories:
-    - events
     - tickets
+    - events
   ceType: com.ibm.aiops.connectors.configuration
   components:
     - apiType: AsyncAPI
       name: connector
-  documentation: >-
-    https://www.ibm.com/docs/en/cloud-paks/cloud-pak-aiops
+  documentation: >- # change the documentation reference
+    https://www.ibm.com/docs/en/cloud-paks/cp-waiops/3.1.1?topic=integrations-configuring-ticketing-integration
   permissions:
     channels:
-      - name: cp4waiops-cartridge.lifecycle.input.events
+      - name: cp4waiops-cartridge.lifecycle.input.events # To create alerts
         operations:
           - write
-      - name: cp4waiops-cartridge.connector-snow-actions
+      - name: cp4waiops-cartridge.itsmincidentresponse # To save the outbound system ticket number to the incident.
+        operations:
+          - write
+      - name: cp4waiops-cartridge.lifecycle.input.connector-responses # To send back responses after creating tickets. 
+        operations:
+          - write
+      - name: cp4waiops-cartridge.lifecycle.output.connector-requests # To listen to the incidents create/update/close events.
         operations:
           - read
-          - write
-      - name: cp4waiops-cartridge.changerequest
-        operations:
-          - write
-      - name: cp4waiops-cartridge.incident
-        operations:
-          - write
-      - name: cp4waiops-cartridge.itsmincidentresponse
-        operations:
-          - write
-      - name: cp4waiops-cartridge.problem
-        operations:
-          - write
-      - name: cp4waiops-cartridge.snow-handlers
-        operations:
-          - read
-      - name: cp4waiops-cartridge.lifecycle.input.connector-responses
-        operations:
-          - write
-      - name: cp4waiops-cartridge.lifecycle.output.connector-requests
-        operations:
-          - read          
   encryptedFields:
     - /password          
   schema:
@@ -57,23 +40,23 @@ spec:
       password:
         format: secret
         type: string
-      types:
+      types: # Don't change this as this is required and might have an impact
         type: string
       url:
         type: string
       username:
         type: string
+      issueSamplingRate:
+        type: integer
       datasource_type:
-        default: tickets
-        enum:
-          - tickets
-          - 'tickets,inventory'
-          - inventory
-        type: string
+        description: List of categories
+        items:
+          type: string
+        type: array
       historical_config:
         additionalProperties: false
         properties:
-          collection_mode:
+          collectionMode:
             default: historical
             enum:
               - historical
@@ -85,26 +68,25 @@ spec:
             format: date-time
             type: string
         required:
-          - collection_mode
+          - collectionMode
           - start_date
           - end_date
         type: object  
-      mapping:
-        additionalProperties:
-          type: string
-        type: object              
+      mappings:
+        description: The incident creation mappings
+        type: string
     type: object
   uiSchema:
-    type: ticket-template
-    displayName: "Ticket Template"
-    iconFileType: png
+    type: ticket-template # change this to the integration that you are adding.
+    displayName: "Ticket Template" # change this to the integration that you are adding.
+    iconFileType: png 
     iconFileSize: 96
     categories: 
       - "{{connector.common.category.notifications}}"
-    url: https://www.ibm.com/docs/en/cloud-paks/cloud-pak-aiops
+    url: https://ibm.biz/int-tickettemplate
     apiAdaptor: grpc
     datasourceType: tickets
-    sidePanelTitle: "{{sidePanel.title.servicenow}}"
+    sidePanelTitle: "Configuring a Ticket template integration"
     sidePanelDescription: "{{connector.servicenow.sidepanel.description}}"
     sidePanelInfoHeader: "{{sidePanel.information.header}}"
     sidePanelInfo:
@@ -120,8 +102,8 @@ spec:
     isObserver: false
     deploymentType: ["local", "remote"]
     AIModelTypeList:
-      - "{{sidePanel.AIModelTypes.changeRisk}}"
-      - "{{sidePanel.AIModelTypes.similarIncidents}}"
+      - "{{sidePanel.AIModelTypes.changeRisk}}" # Remove if change risk is not used 
+      - "{{sidePanel.AIModelTypes.similarIncidents}}"  # Remove if similar tickets is not used
     formSteps:
       - step:
           id: addConnection
@@ -135,6 +117,12 @@ spec:
           name: "{{formSteps.collectTickets}}"
           isOptional: true
     form:
+      - id: type
+        element: input
+        type: hiddenText  
+        defaultValue: ["tickets"]
+        apiMapping: connection_config.datasource_type
+        formStep: addConnection
       - id: name
         element: input
         type: text
@@ -158,7 +146,6 @@ spec:
         element: input
         type: text
         label: "{{connector.servicenow.form.url.label}}"
-        placeholder: "{{connector.servicenow.form.url.placeholder}}"
         helperText: "{{common.egress_warning}}"
         apiMapping: connection_config.url
         formStep: addConnection
@@ -176,7 +163,7 @@ spec:
         element: input
         type: password
         label: "{{connector.common.form.password.label}}"
-        placeholder: "{{connector.common.form.password.placeholder}}"
+        helperText: "{{connector.common.form.password.placeholder}}"
         apiMapping: connection_config.password
         formStep: addConnection
         isRequired: true
@@ -185,23 +172,28 @@ spec:
         type: radio
         label: "{{connector.common.form.orchestration.label}}"
         items: 
-          - "{{connection_form.dynamic_item.local}}"
-          - "{{connection_form.dynamic_item.remote}}"
+          - "{{common.filtering.local}}"
+          - "{{common.filtering.remote}}"
         itemKeys: ["local", "microedge"]
         apiMapping: connection_config.deploymentType
         formStep: addConnection
+        form:
+          - id: local
+          - id: microedge
+            rows:
+              - id: technology_notification
+                element: input
+                type: notification
+                kind: info
+                hideCloseButton: true
+                title: "{{common.note}}"
+                subtitle: "{{connection.appdynamics.deployment.notification}}"
       - id: connection_test
         element: input
         type: test
         label: "{{connector.common.form.connection_test.label}}"
-        headerLabel: "{{connector.servicenow.form.mappingText.headerLabel}}"
+        helperText: "{{connector.common.form.connection_test.helperText}}"
         formStep: addConnection
-      - id: mapping
-        element: input
-        type: json
-        label: "{{connector.custom.form.mapping.label}}"
-        apiMapping: connection_config.mapping
-        formStep: fieldMapping
       - id: data_flow
         element: input
         type: toggle
@@ -210,23 +202,32 @@ spec:
         labelOff: "{{common.Off}}"
         labelOn: "{{common.On}}"
         headerLabel: "{{connector.common.form.ticketCollection.headerLabel}}"
-        apiMapping: connection_config.data_flow_ticket
+        apiMapping: connection_config.data_flow
         formStep: collectTickets
       - id: dynamic_schedule_form
         element: form
         label: "{{common.mode}}"
         items: 
-          - "{{connection_form.dynamic_item.inference.tickets}}"
           - "{{connection_form.dynamic_item.live.tickets}}"
           - "{{connection_form.dynamic_item.historical.tickets}}"
-        itemKeys: ["inference", "live", "historical"]
-        apiMapping: connection_config.collection_mode
+        itemKeys: ["live", "historical"]
+        apiMapping: connection_config.collectionMode
         formStep: collectTickets
         form:
-          - id: inference
-            rows:
           - id: live
             rows:
+              - id: issueSamplingRate
+                element: input
+                type: number
+                label: "{{connector.github.form.incident_sampling_rate.label}}"
+                min: 1
+                max: 60
+                step: 1
+                defaultValue: 1
+                helperText: "{{connector.github.form.incident_sampling_rate.helperText}}"
+                apiMapping: connection_config.issueSamplingRate
+                formStep: collectTickets
+                isRequired: true
           - id: historical
             rows:
               - id: start
@@ -241,11 +242,20 @@ spec:
                 label: "{{connector.common.form.end_date.label}}"
                 placeholder: "{{connector.common.form.end_date.placeholder}}"
                 apiMapping: connection_config.end
-      - id: types
+      - id: mappings
         element: input
-        type: text
-        label: "{{connector.servicenow.form.types.label}}"
-        placeholder: "{{connector.servicenow.form.types.placeholder}}"
-        helperText: "{{connector.servicenow.form.types.helperText}}"
-        apiMapping: connection_config.types
-        formStep: collectTickets
+        type: emailJsonata
+        headerLabel: "{{connector.github.form.mappings.message}}"
+        headerLabelLink: https://ibm.biz/int-tickettemplate
+        label:  "{{connector.github.form.mappings.label}}"
+        isRequired: true
+        apiMapping: connection_config.mappings
+        formStep: fieldMapping
+        defaultValue: |
+          ({
+              "title": $string(incident.title),
+              "body": $join(["Incident Id:", $string(incident.id),
+                             "\nAIOPS Incident Overview URL: https://", $string(URL_PREFIX), "/aiops/default/resolution-hub/incidents/all/", $string(incident.id), "/overview",
+                             "\nStatus: ", $string(incident.state),
+                             "\nDescription: ", $string(incident.description)])
+          })

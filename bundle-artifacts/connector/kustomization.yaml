@@ -31,3 +31,11 @@ vars:
       apiVersion: v1
     fieldref:
       fieldpath: metadata.namespace
+
+patches:
+- patch: |-
+    - op: replace
+      path: /spec/template/spec/volumes/4/secret/secretName
+      value: AIOPS-DYNAMIC-REPLACE-ELASTICSEARCHSECRETNAME
+  target:
+    kind: Deployment
