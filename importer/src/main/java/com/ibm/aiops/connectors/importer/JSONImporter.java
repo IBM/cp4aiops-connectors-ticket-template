@@ -11,7 +11,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ibm.cp4waiops.connectors.sdk.models.Ticket;
+import com.ibm.aiops.connectors.importer.model.Ticket;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
