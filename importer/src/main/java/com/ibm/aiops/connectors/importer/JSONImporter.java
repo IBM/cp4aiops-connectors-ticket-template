@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 import org.json.JSONArray;
@@ -32,7 +33,8 @@ public class JSONImporter
         DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
         try {
-            ElasticHelper elasticHelper = new ElasticHelper();
+            // For AIOps version 4.9.0 and above, OpenSearch is used instead
+            OpenSearchHelper openSeaarchHelper = new OpenSearchHelper();
 
             if (jsonString != null) {
                 // Parse the JSON string
@@ -86,7 +88,10 @@ public class JSONImporter
                         ObjectMapper om = new ObjectMapper();
                         Ticket myTicket = om.readValue(normalizedJSON.toString(), Ticket.class);
 
-                        elasticHelper.insertIntoElastic(myTicket.getHashMap(), INCIDENT_INDEX);
+                        ArrayList<Ticket> list = new ArrayList<Ticket>();
+                        list.add(myTicket);
+                        openSeaarchHelper.insert(list, INCIDENT_INDEX);
+
                         validEntries++;
 
                     } catch (Exception e){
