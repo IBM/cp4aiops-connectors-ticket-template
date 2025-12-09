@@ -18,7 +18,8 @@ import lombok.ToString;
  * configuration, add it here and ensure it is defined in your BundleManifest's schema
  */
 
- // Todo: If connector schema is modified with new form varibales add them here. Remove the ones that are no longer required.
+// Todo: If connector schema is modified with new form varibales add them here. Remove the ones that are no longer
+// required.
 @Data
 @ToString(exclude = "password")
 public class Configuration {
