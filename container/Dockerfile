@@ -16,7 +16,7 @@ ARG VERBOSE=true
 ENV LICENSE=accept
 
 USER 0
-RUN dnf install -y procps-ng && dnf clean all
+RUN microdnf install -y procps-ng && microdnf clean all
 USER 1001
 
 COPY container/import-certs.sh /opt/import-certs.sh
