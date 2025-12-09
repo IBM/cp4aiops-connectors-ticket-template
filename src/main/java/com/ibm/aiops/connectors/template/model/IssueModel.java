@@ -146,8 +146,8 @@ public class IssueModel {
      *
      * @return
      */
-    
-     // Todo: Modify this function if required
+
+    // Todo: Modify this function if required
     public static String getIssueId(byte[] data) {
         // A helper method to get the proper k
         try {

@@ -271,7 +271,8 @@ public class IssuePollingAction implements Runnable {
                 }
                 json.put(Ticket.key_sys_updated_by, closedByUser);
                 json.put(Ticket.key_closed_by, closedByUser);
-                json.put(Ticket.key_caller_id, "IBM Cloud Pak for AIOps "); // This is how it is in ServiceNow, we follow the same format
+                json.put(Ticket.key_caller_id, "IBM Cloud Pak for AIOps "); // This is how it is in ServiceNow, we
+                                                                            // follow the same format
                 json.put(Ticket.key_sys_class_name, "Incident");
                 json.put(Ticket.key_instance, getDomainName(html_url));
                 json.put(Ticket.key_sys_updated_on, obj.getString("updated_at"));
