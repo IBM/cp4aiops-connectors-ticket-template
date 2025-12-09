@@ -25,10 +25,10 @@ COPY --chown=1001:0 container/jvm.options /config/
 
 # Add Liberty server configuration including all necessary features
 COPY --chown=1001:0 container/server.xml /config/
-RUN features.sh && configure.sh
+RUN features.sh
 
-COPY --from=builder /build/connector/target/ticket-template.war /config/apps/
+COPY --from=builder --chown=1001:0 /build/connector/target/ticket-template.war /config/apps/
 
 USER 1001
 
-RUN features.sh && configure.sh
+RUN configure.sh
