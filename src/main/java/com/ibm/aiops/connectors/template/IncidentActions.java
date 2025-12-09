@@ -92,36 +92,34 @@ public class IncidentActions implements Runnable {
                 // trigger kafka topic to push it to insights.
                 logger.log(Level.INFO, "Triggering Kafka topic");
                 ObjectMapper objectMapper = new ObjectMapper();
-                // Todo: This this the response from your system. Change the id and number to fit with the system you are using. 
-                // For example GitHub have {id:"someid", html_url:"permalink to issue", number:"issue number"} as the response. We use these to link between AIOps incident id and Github number.
-                
+                // Todo: This this the response from your system. Change the id and number to fit with the system you
+                // are using.
+                // For example GitHub have {id:"someid", html_url:"permalink to issue", number:"issue number"} as the
+                // response. We use these to link between AIOps incident id and Github number.
+
                 String responseBody = responseJSON.get("data").asText();
                 JsonNode data = objectMapper.readTree(responseBody);
                 logger.log(Level.INFO, "Triggering Kafka topic data", data);
                 // Todo: you can change html_url to point to your systems permalink
                 String permalink = data.get("html_url").asText();
                 logger.log(Level.INFO, "Triggering Kafka topic", data.get("html_url").asText());
-                
-                // Todo: Change the id and number to fit with the system you are using. 
-                // IssueModel.getResponse is used to set the mappings. 
+
+                // Todo: Change the id and number to fit with the system you are using.
+                // IssueModel.getResponse is used to set the mappings.
                 String response = IssueModel.getResponse(data.get("id").asText(), true,
                         "Created incident with id =  " + data.get("number").asText(), data.get("number").asText(),
                         connector.getConnectorID(), IssueModel.getStoryId(request.getData()), "Successful", permalink);
-                
+
                 // Todo: Change the TicketingSystem to the name of your system
                 CloudEvent ce = connector.createEvent(0, "com.ibm.sdlc.TicketingSystem.issue.create.response", response,
                         new URI(permalink));
                 connector.emitCloudEvent(ACTION_TicketingSystem_RESPONSE, connector.getPartition(), ce);
-                /** 
-                 * This saves as something as below
-                 * {
-                 * "name": ConnectorConstants.TICKET_TYPE,
-                 * "permalink": "the one you set with html_url",
-                 * "ticket_num": "number", 
-                 * "id":"id"
-                 * }
-                 * */ 
-                // When you are referecing to get the id you can use these fields. Check and modify IssueModel.getIssueId in IssueModel.java file. We use this in updateIncident method.
+                /**
+                 * This saves as something as below { "name": ConnectorConstants.TICKET_TYPE, "permalink": "the one you
+                 * set with html_url", "ticket_num": "number", "id":"id" }
+                 */
+                // When you are referecing to get the id you can use these fields. Check and modify
+                // IssueModel.getIssueId in IssueModel.java file. We use this in updateIncident method.
 
                 actionCounter.increment();
             } else {
@@ -161,7 +159,8 @@ public class IncidentActions implements Runnable {
         }
 
         try {
-            // Todo: IssueModel.getIssueId gets you the number/id of the system that you mapped AIOps incident id with. Change it accordingly as required.
+            // Todo: IssueModel.getIssueId gets you the number/id of the system that you mapped AIOps incident id with.
+            // Change it accordingly as required.
             String issueNum = IssueModel.getIssueId(request.getData());
             if (issueNum != null) {
                 ObjectNode responseJSON = updateIssue(requestContent, config.getMappings(), issueNum);
@@ -245,17 +244,17 @@ public class IncidentActions implements Runnable {
             ObjectNode requestBodyJson = JsonNodeFactory.instance.objectNode();
 
             Iterator<Map.Entry<String, JsonNode>> fields = parsedContent.fields();
-            while(fields.hasNext()){
+            while (fields.hasNext()) {
                 Map.Entry<String, JsonNode> field = fields.next();
                 requestBodyJson.put(field.getKey().toString(), field.getValue().toString());
             }
 
             // title and body are the keys you provided in mappings. Format them if needed
             // if (parsedContent.has("title")) {
-            //     requestBodyJson.put("title", parsedContent.get("title").asText());
+            // requestBodyJson.put("title", parsedContent.get("title").asText());
             // }
             // if (parsedContent.has("body")) {
-            //     requestBodyJson.put("body", parsedContent.get("body").asText());
+            // requestBodyJson.put("body", parsedContent.get("body").asText());
             // }
 
             try {
@@ -306,7 +305,7 @@ public class IncidentActions implements Runnable {
             ObjectNode requestBodyJson = JsonNodeFactory.instance.objectNode();
 
             Iterator<Map.Entry<String, JsonNode>> fields = parsedContent.fields();
-            while(fields.hasNext()){
+            while (fields.hasNext()) {
                 Map.Entry<String, JsonNode> field = fields.next();
                 requestBodyJson.put(field.getKey().toString(), field.getValue().toString());
             }

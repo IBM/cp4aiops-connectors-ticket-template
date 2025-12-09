@@ -69,7 +69,7 @@ public class TicketConnector extends NotificationConnectorBase {
     protected ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
 
     // Queue to process events without blocking
-    protected ConcurrentLinkedQueue<ConnectorAction> actionQueue = new ConcurrentLinkedQueue<ConnectorAction>(); 
+    protected ConcurrentLinkedQueue<ConnectorAction> actionQueue = new ConcurrentLinkedQueue<ConnectorAction>();
 
     private ConnectorAction issuePollingAction;
     private IssuePollingAction issuePollingInstance;
