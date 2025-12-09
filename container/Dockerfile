@@ -19,12 +19,12 @@ USER 0
 RUN microdnf install -y procps-ng && microdnf clean all
 USER 1001
 
-COPY container/import-certs.sh /opt/import-certs.sh
+COPY --chown=1001:0 container/import-certs.sh /opt/import-certs.sh
 RUN chmod ug+x /opt/import-certs.sh
-COPY container/jvm.options /config/
+COPY --chown=1001:0 container/jvm.options /config/
 
 # Add Liberty server configuration including all necessary features
-COPY container/server.xml /config/
+COPY --chown=1001:0 container/server.xml /config/
 RUN features.sh && configure.sh
 
 COPY --from=builder /build/connector/target/ticket-template.war /config/apps/
