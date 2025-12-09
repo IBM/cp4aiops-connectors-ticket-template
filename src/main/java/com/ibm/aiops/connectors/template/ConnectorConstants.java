@@ -27,11 +27,11 @@ public class ConnectorConstants {
 
     // Todo: this could be anything like github jira etc.
     public static final String TICKET_TYPE = "ticket-template";
-    
+
     static final URI SELF_SOURCE = URI.create("template.connectors.aiops.ibm.com/" + TICKET_TYPE);
-    
+
     // Prefix shouldn't be changed. This helps in mapping the ticketing system to AIOps.
-    static final String TOOL_TYPE_TICKET = "com.ibm.type.ticket." + TICKET_TYPE; 
+    static final String TOOL_TYPE_TICKET = "com.ibm.type.ticket." + TICKET_TYPE;
 
     // Actions
     static final String ISSUE_POLL = "com.ibm.type.ticket." + TICKET_TYPE + ".issue.poll";
@@ -48,7 +48,8 @@ public class ConnectorConstants {
     // Topic to produce alert create event
     static final String TOPIC_INPUT_LIFECYCLE_EVENTS = "cp4waiops-cartridge.lifecycle.input.events";
     // Example of Cloud Event type for Alert creation.
-    static final String INSTANCE_HISTORICAL_DATACOLLECTION_CE_TYPE = "com.ibm.type.ticket." + TICKET_TYPE + ".historical.datacollection.information";
+    static final String INSTANCE_HISTORICAL_DATACOLLECTION_CE_TYPE = "com.ibm.type.ticket." + TICKET_TYPE
+            + ".historical.datacollection.information";
 
     static final List<String> ALERT_TYPES_LIST = Arrays.asList(INSTANCE_HISTORICAL_DATACOLLECTION_CE_TYPE);
 }

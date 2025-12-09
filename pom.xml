@@ -7,8 +7,9 @@
   <version>1.0-SNAPSHOT</version>
   <packaging>war</packaging>
   <properties>
-    <maven.compiler.source>11</maven.compiler.source>
-    <maven.compiler.target>11</maven.compiler.target>
+    <maven.compiler.source>21</maven.compiler.source>
+    <maven.compiler.target>21</maven.compiler.target>
+    <lombok.version>1.18.42</lombok.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
@@ -42,7 +43,7 @@
     <dependency>
       <groupId>com.ibm.cp4waiops.connectors</groupId>
       <artifactId>connectors-sdk</artifactId>
-      <version>2.3.0</version> <!-- CONNECTOR_SDK_VERSION -->
+      <version>3.0.1</version> <!-- CONNECTOR_SDK_VERSION -->
     </dependency>
     <!-- CloudEvent object and associated builder -->
     <dependency>
@@ -64,7 +65,7 @@
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <version>3.8.0</version>
+      <version>5.11.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -88,7 +89,20 @@
       </plugin>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.10.1</version>
+          <version>3.14.1</version>
+          <configuration>
+              <source>${maven.compiler.source}</source>
+              <target>${maven.compiler.target}</target>
+              <fork>true</fork>
+
+              <annotationProcessorPaths>
+                  <path>
+                      <groupId>org.projectlombok</groupId>
+                      <artifactId>lombok</artifactId>
+                      <version>${lombok.version}</version>
+                  </path>
+              </annotationProcessorPaths>
+          </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -114,7 +128,7 @@
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.7</version>
+        <version>0.8.14</version>
         <executions>
           <execution>
             <id>coverage-initialize</id>
