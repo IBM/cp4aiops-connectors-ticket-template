@@ -1,0 +1,20 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: CUSTOMBUNDLENAME
+spec:
+  ipFamilies:
+    - IPv4
+  ports:
+    - name: https
+      protocol: TCP
+      port: 443
+      targetPort: https
+  internalTrafficPolicy: Cluster
+  type: ClusterIP
+  ipFamilyPolicy: SingleStack
+  sessionAffinity: None
+  selector:
+    app: CUSTOMBUNDLENAME
+status:
+  loadBalancer: {}

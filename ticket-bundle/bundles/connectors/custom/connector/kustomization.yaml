@@ -1,0 +1,41 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - deployment.yaml
+  - service.yaml
+  - serviceaccount.yaml
+  - servicemonitor.yaml
+
+configurations:
+  - namereference.yaml
+  - varreference.yaml
+
+images:
+  - name: CUSTOMCONNECTORNAME
+    newName: CUSTOMCONNECTORIMAGENAME
+    newTag: CUSTOMCONNECTORIMAGETAG
+
+vars:
+  - name: SERVICE_NAME
+    objref:
+      kind: Service
+      name: CUSTOMCONNECTORNAME
+      apiVersion: v1
+    fieldref:
+      fieldpath: metadata.name
+  - name: SERVICE_NAMESPACE
+    objref:
+      kind: Service
+      name: CUSTOMCONNECTORNAME
+      apiVersion: v1
+    fieldref:
+      fieldpath: metadata.namespace
+
+patches:
+- patch: |-
+    - op: replace
+      path: /spec/template/spec/volumes/5/secret/secretName
+      value: AIOPS-DYNAMIC-REPLACE-ELASTICSEARCHSECRETNAME
+  target:
+    kind: Deployment

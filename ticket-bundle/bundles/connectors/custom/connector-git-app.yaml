@@ -1,0 +1,20 @@
+apiVersion: connectors.aiops.ibm.com/v1beta1
+kind: GitApp
+metadata:
+  name: github-bundle
+spec:
+  repo: 'https://CUSTOMBUNDLENAME.{{ .Namespace }}.svc/git/cp4waiops-connectors'
+  branch: bundled-version
+  authSecret:
+    name: cp4waiops-connectors-deploy-auth-secret
+  certSecret:
+    name: cp4waiops-connectors-deploy-cert-secret
+  components:
+    - name: connector
+      path: /bundles/connectors/custom/connector
+      type: kustomize
+      kustomization:
+        images:
+          - name: CUSTOMCONNECTORNAME
+            newName: CUSTOMCONNECTORIMAGENAME
+            newTag: CUSTOMCONNECTORIMAGETAG

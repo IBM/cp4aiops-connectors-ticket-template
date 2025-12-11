@@ -1,0 +1,22 @@
+<server>
+  <!-- These are the production settings used in the docker container -->
+  <featureManager>
+    <feature>restfulWSClient-3.0</feature>
+    <feature>servlet-5.0</feature>
+    <feature>mpMetrics-4.0</feature>
+    <feature>mpConfig-3.0</feature>
+    <feature>mpHealth-4.0</feature>
+  </featureManager>
+
+  <httpEndpoint id="defaultHttpEndpoint"
+                host="*"
+                httpsPort="9443"/>
+
+  <webApplication location="github.war" contextRoot="/" />
+
+  <!-- warning level logging for production -->
+  <logging consoleFormat="simple" consoleSource="message,trace" consoleLogLevel="info" traceFileName="stdout" traceFormat="BASIC" traceSpecification="com.ibm.aiops.connectors.*=all" />
+  <!-- trace logging for debugging, do NOT ship with this enabled -->
+  <!-- <logging consoleFormat="simple" consoleSource="message,trace" consoleLogLevel="info" traceFileName="stdout" traceFormat="BASIC" traceSpecification="com.ibm.aiops.connectors.*=all" /> -->
+
+</server>
