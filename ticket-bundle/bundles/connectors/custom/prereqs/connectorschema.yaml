@@ -1,0 +1,266 @@
+apiVersion: connectors.aiops.ibm.com/v1beta1
+kind: ConnectorSchema
+metadata:
+  name: CUSTOMCONNECTORNAME
+  labels:
+    aiops-connector-category-ticketing: "true"
+spec:
+  categories:
+    - tickets
+    - events
+  ceType: com.ibm.aiops.connectors.configuration
+  components:
+    - apiType: AsyncAPI
+      name: connector
+  documentation: >-
+    https://www.ibm.com/docs/en/cloud-paks/cp-waiops/3.1.1?topic=integrations-configuring-github-integration
+  permissions:
+    channels:
+      - name: cp4waiops-cartridge.lifecycle.input.events
+        operations:
+          - write
+      - name: cp4waiops-cartridge.itsmincidentresponse
+        operations:
+          - write
+      - name: cp4waiops-cartridge.lifecycle.input.connector-responses
+        operations:
+          - write
+      - name: cp4waiops-cartridge.lifecycle.output.connector-requests
+        operations:
+          - read
+      - name: cp4waiops-cartridge.incident
+        operations:
+          - write
+  encryptedFields:
+    - /token          
+  schema:
+    allOf:
+      - required:
+          - url
+          - owner
+          - repo
+          - token
+          - username
+    properties:
+      token:
+        format: secret
+        type: string
+      types:
+        type: string
+      url:
+        type: string
+      username:
+        type: string
+      owner:
+        type: string
+      repo:
+        type: string
+      issueSamplingRate:
+        type: integer
+      datasource_type:
+        description: List of categories
+        items:
+          type: string
+        type: array
+      historical_config:
+        additionalProperties: false
+        properties:
+          collectionMode:
+            default: historical
+            enum:
+              - historical
+            type: string
+          start_date:
+            format: date-time
+            type: string
+        required:
+          - collectionMode
+          - start_date
+        type: object  
+      mappingsGithub:
+        description: The incident creation mappings
+        type: string            
+    type: object
+  uiSchema:
+    type: CUSTOMCONNECTORNAME
+    displayName: "CUSTOMCONNECTORDISPLAYNAME"
+    iconFileType: svg
+    iconFileName: github
+    categories: 
+      - "{{connector.common.category.tickets}}"
+    url: https://ibm.biz/int-github
+    apiAdaptor: grpc
+    datasourceType: tickets
+    sidePanelTitle: "{{integrations.sidePanel.github.title}}"
+    sidePanelDescription: "{{integrations.sidePanel.github.description}}"
+    sidePanelInfoHeader: "{{integrations.sidePanel.github.information.header}}"
+    sidePanelInfo:
+      - "{{integrations.sidePanel.github.information.Row.1}}"
+      - "{{integrations.sidePanel.github.information.Row.2}}"
+      - "{{connector.github.form.username.label}}"
+      - "{{connector.github.form.owner.label}}"
+      - "{{connector.github.form.repo.label}}"
+    hasOptionalConfig: true
+    sidePanelOptionalConfigHeader: "{{sidePanel.optional.config.header}}"
+    sidePanelOptionalConfigList:
+      - "{{sidePanel.optional.config.fieldMappingSearch}}"
+    hasOptionalText: false
+    hasAIModelType: true
+    isObserver: false
+    deploymentType: ["local"]
+    AIModelTypeList:
+      - "{{sidePanel.AIModelTypes.similarIncidents}}"
+    formSteps:
+      - step:
+          id: addConnection
+          name: "{{formSteps.addConnection}}"
+      - step:
+          id: fieldMapping
+          name: "{{formSteps.fieldMapping}}"
+      - step:
+          id: collectTickets
+          name: "{{formSteps.collectTickets}}"
+          isOptional: true
+    form:
+      - id: type
+        element: input
+        type: hiddenText  
+        defaultValue: ["tickets"]
+        apiMapping: connection_config.datasource_type
+        formStep: addConnection
+      - id: name
+        element: input
+        type: text
+        label: "{{connector.common.form.uniqueID.label}}"
+        placeholder: "{{connector.common.form.ops_integration_name.placeholder}}"
+        apiMapping: connection_config.display_name
+        formStep: addConnection
+        isRequired: true
+        maxCharLength: 50
+        isDisabledOnUpdate: true
+        isAlphanumeric: true
+      - id: description
+        element: input
+        type: textarea
+        label: "{{connector.common.form.description.label}}"
+        placeholder: "{{connector.common.form.description.placeholder}}"
+        apiMapping: connection_config.description
+        formStep: addConnection
+        maxCharLength: 600
+      - id: url
+        element: input
+        type: text
+        label: "{{connector.github.form.url.label}}"
+        placeholder: "{{connector.github.form.url.placeholder}}"
+        helperText: "{{common.egress_warning}}"
+        apiMapping: connection_config.url
+        formStep: addConnection
+        isRequired: true
+        isURL : true
+      - id: token
+        element: input
+        type: password
+        label: "{{connector.github.form.token.label}}"
+        placeholder: "{{connector.github.form.token.placeholder}}"
+        helperText: "{{connector.github.form.token.helperText}}"
+        apiMapping: connection_config.token
+        formStep: addConnection
+        isRequired: true
+      - id: username
+        element: input
+        type: text
+        label: "{{connector.github.form.username.label}}"
+        placeholder: "{{connector.github.form.username.placeholder}}"
+        apiMapping: connection_config.username
+        formStep: addConnection
+        maxCharLength: 600
+        isRequired: true
+      - id: owner
+        element: input
+        type: text
+        label: "{{connector.github.form.owner.label}}"
+        placeholder: "{{connector.github.form.owner.placeholder}}"
+        apiMapping: connection_config.owner
+        formStep: addConnection
+        isRequired: true
+      - id: repo
+        element: input
+        type: text
+        label: "{{connector.github.form.repo.label}}"
+        placeholder: "{{connector.github.form.repo.placeholder}}"
+        apiMapping: connection_config.repo
+        formStep: addConnection
+        isRequired: true
+      - apiMapping: connection_config.deploymentType
+        element: input
+        formStep: addConnection
+        id: orchestration
+        type: hiddenText
+        defaultValue: local
+      - id: installationPreference
+        element: input
+        type: installPreference
+        installationSelection: local
+        formStep: addConnection
+      - id: data_flow
+        element: input
+        type: toggle
+        defaultToggled: false
+        label: "{{connector.common.form.data_flow.label}}"
+        labelOff: "{{common.Off}}"
+        labelOn: "{{common.On}}"
+        headerLabel: "{{connector.github.form.collectdata.label}}"
+        headerLabelLink: https://ibm.biz/int-github
+        apiMapping: connection_config.data_flow
+        formStep: collectTickets
+      - id: dynamic_schedule_form
+        element: form
+        label: "{{common.mode}}"
+        items: 
+          - "{{connector.github.live}}"
+          - "{{connector.github.historical}}"
+        itemKeys: ["live", "historical"]
+        apiMapping: connection_config.collectionMode
+        formStep: collectTickets
+        form:
+          - id: live
+            rows:
+              - id: issueSamplingRate
+                element: input
+                type: number
+                label: "{{connector.github.form.incident_sampling_rate.label}}"
+                min: 1
+                max: 60
+                step: 1
+                defaultValue: 1
+                helperText: "{{connector.github.form.incident_sampling_rate.helperText}}"
+                apiMapping: connection_config.issueSamplingRate
+                formStep: collectTickets
+                isRequired: true
+          - id: historical
+            rows:
+              - id: start
+                element: input
+                type: date
+                label: "{{connector.common.form.start_date.label}}"
+                placeholder: "{{connector.common.form.start_date.placeholder}}"
+                apiMapping: connection_config.start
+                helperText: "{{connector.github.form.start.helperText}}"
+      - id: mappingsGithub
+        element: input
+        type: emailJsonata
+        headerLabel: "{{connector.github.form.mappings.message}}"
+        headerLabelLink: https://ibm.biz/int-github
+        label:  "{{connector.github.form.mappings.label}}"
+        isRequired: true
+        apiMapping: connection_config.mappingsGithub
+        formStep: fieldMapping
+        defaultValue: |
+          ({
+              "title": $string(incident.title),
+              "body": $join(["Incident Id:", $string(incident.id),
+                             "\nAIOPS Incident Overview URL: https://", $string(URL_PREFIX), "/aiops/default/resolution-hub/incidents/all/", $string(incident.id), "/overview",
+                             "\nStatus: ", $string(incident.state),
+                             "\nDescription: ", $string(incident.description)]),
+              "labels": [$join(["priority:", $string(incident.priority)])]
+          })

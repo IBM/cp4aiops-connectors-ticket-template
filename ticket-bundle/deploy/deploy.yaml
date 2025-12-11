@@ -1,0 +1,152 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: CUSTOMBUNDLENAME
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "CUSTOMBUNDLENAME"
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: CUSTOMBUNDLENAME
+    spec:
+      restartPolicy: Always
+      initContainers:
+        - resources:
+            limits:
+              cpu: '1'
+              ephemeral-storage: 500Mi
+              memory: 250Mi
+            requests:
+              cpu: 5m
+              ephemeral-storage: '0'
+              memory: 100Mi
+          terminationMessagePath: /dev/termination-log
+          name: gen-htpasswd
+          command:
+            - bash
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            runAsNonRoot: true
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: pass
+              mountPath: /conf
+            - name: tmp
+              mountPath: /tmp
+          terminationMessagePolicy: File
+          envFrom:
+            - secretRef:
+                name: cp4waiops-connectors-deploy-auth-secret
+          image: 'CUSTOMBUNDLEIMAGENAME:CUSTOMBUNDLEIMAGETAG'
+          args:
+            - '-c'
+            - 'htpasswd -bc /conf/.htpasswd ${username} ${password}'
+      serviceAccountName: cp4waiops-connectors-deploy
+      imagePullSecrets:
+        - name: ibm-aiops-pull-secret
+      schedulerName: default-scheduler
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/arch
+                    operator: In
+                    values:
+                      - amd64
+                      - ppc64le
+                      - s390x
+      terminationGracePeriodSeconds: 30
+      securityContext: {}
+      containers:
+        - resources:
+            limits:
+              cpu: '1'
+              ephemeral-storage: 500Mi
+              memory: 250Mi
+            requests:
+              cpu: 5m
+              ephemeral-storage: '0'
+              memory: 100Mi
+          readinessProbe:
+            httpGet:
+              path: /server-status
+              port: https
+              scheme: HTTPS
+            initialDelaySeconds: 5
+            timeoutSeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          terminationMessagePath: /dev/termination-log
+          name: server
+          livenessProbe:
+            exec:
+              command:
+                - liveness
+            initialDelaySeconds: 30
+            timeoutSeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            runAsNonRoot: true
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+          ports:
+            - name: https
+              containerPort: 8080
+              protocol: TCP
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: pass
+              readOnly: true
+              mountPath: /conf
+            - name: certs
+              readOnly: true
+              mountPath: /tls
+            - name: cm
+              readOnly: true
+              mountPath: /etc/httpd/conf.d/tls.conf
+              subPath: tls.conf
+            - name: run
+              mountPath: /etc/httpd/run
+          terminationMessagePolicy: File
+          image: 'CUSTOMBUNDLEIMAGENAME:CUSTOMBUNDLEIMAGETAG'
+      serviceAccount: cp4waiops-connectors-deploy
+      volumes:
+        - name: pass
+          emptyDir: {}
+        - name: cm
+          configMap:
+            name: cp4waiops-connectors-deploy-server-config
+            defaultMode: 420
+        - name: certs
+          secret:
+            secretName: CUSTOMBUNDLENAME-cert-secret
+            defaultMode: 420
+        - name: tmp
+          emptyDir: {}
+        - name: run
+          emptyDir: {}
+      dnsPolicy: ClusterFirst
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600

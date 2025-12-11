@@ -1,0 +1,281 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: CUSTOMCONNECTORNAME
+  labels:
+    app: CUSTOMCONNECTORNAME
+    connectors.aiops.ibm.com/restart-on-secret-changed: ""
+  annotations:
+    cp4aiops.ibm.com/name: "AIOps connector ticket sample"
+    cp4aiops.ibm.com/description: "Ticket sample"
+    cp4aiops.ibm.com/depends-on: "kafka,opensearch"
+spec:
+  selector:
+    matchLabels:
+      app: CUSTOMCONNECTORNAME
+      instance: connector
+  template:
+    metadata:
+      labels:
+        app: CUSTOMCONNECTORNAME
+        instance: connector
+    spec:
+      imagePullSecrets:
+        - name: ibm-aiops-pull-secret
+      restartPolicy: Always
+      serviceAccountName: connector
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/arch
+                    operator: In
+                    values:
+                      - amd64
+                      - ppc64le
+                      - s390x  
+                  - key: kubernetes.io/os
+                    operator: In
+                    values:
+                      - linux
+      initContainers:
+        - image: CUSTOMCONNECTORIMAGENAME:CUSTOMCONNECTORIMAGETAG
+          imagePullPolicy: Always
+          name: cert-setup
+          command:
+            - "/opt/import-certs.sh"
+          resources:
+            requests:
+              cpu: 200m
+              memory: 300Mi
+              ephemeral-storage: "0"
+            limits:
+              cpu: 200m
+              memory: 500Mi
+              ephemeral-storage: 200Mi
+          volumeMounts:
+            - name: server-certs-raw
+              mountPath: /opt/raw-cert
+            - name: server-certs
+              mountPath: /opt/cert
+            - name: config-overrides
+              mountPath: /config/configDropins/overrides/
+            - name: temp-volume
+              mountPath: /tmp
+            - name: wlp-output
+              mountPath: /opt/ibm/wlp/output/defaultServer
+            - name: logs
+              mountPath: /logs
+            - name: config-defaults
+              mountPath: /config/configDropins/defaults
+            - name: bootstrap-volume
+              mountPath: /config/bootstrap.properties
+              subPath: bootstrap.properties           
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+      containers:
+        - image: CUSTOMCONNECTORIMAGENAME:CUSTOMCONNECTORIMAGETAG
+          imagePullPolicy: Always
+          name: CUSTOMCONNECTORNAME
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: KAFKA_SCRAM_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: user
+                  name: aiopsedge-kafka-application-secret
+            - name: KAFKA_SCRAM_PASSWORD_PATH
+              value: /etc/zeno/secrets/kafka/password
+            - name: KAFKA_TRUSTSTORE_PATH
+              value: /etc/zeno/secrets/kafka/truststore.jks
+            - name: KAFKA_TRUSTSTORE_PASSWORD_PATH
+              value: /etc/zeno/secrets/kafka/truststore.password
+            - name: KAFKA_PROD_ACKS
+              value: "1"
+            - name: KAFKA_PROD_BATCH_SIZE
+              value: "16384"
+            - name: KAFKA_PROD_LINGER_MS
+              value: "10"
+            - name: KAFKA_PROD_COMPRESSION_TYPE
+              value: "none"    
+            - name: KAFKA_PROD_BUFFER_MEMORY
+              value: "33554432"                                      
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              valueFrom:
+                secretKeyRef:
+                  key: bootstrapServers
+                  name: aiopsedge-kafka-application-secret  
+            - name: URL_PREFIX
+              valueFrom:
+                configMapKeyRef:
+                  name: product-configmap
+                  key: URL_PREFIX
+            - name: SEARCH_BULK_INSERT_MAX_BATCH_SIZE
+              value: "100"           
+            - name: SEARCH_BULK_INSERT_FLUSH_INTERVAL_SECONDS
+              value: "10"
+            - name: SEARCH_BULK_INSERT_MAX_SIZE_MB
+              value: "3"
+            - name: SEARCH_BULK_INSERT_CONCURRENT_REQUESTS
+              value: "1"
+            - name: SEARCH_BULK_INSERT_BACKOFF_TIME_DELAY_SEC
+              value: "1"
+            - name: SEARCH_BULK_INSERT_BACKOFF_MAX_TRIES
+              value: "3"
+            - name: SIZE
+              valueFrom:
+                secretKeyRef:
+                  name: aiopsedge-cluster-info
+                  key: size
+                  optional: true
+          ports:
+            - containerPort: 9443
+              name: metrics
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 200m
+              memory: 500Mi
+              ephemeral-storage: "0"
+            limits:
+              cpu: "1"
+              memory: 800Mi
+              ephemeral-storage: 1Gi
+          livenessProbe:
+            httpGet:
+              path: /h/live
+              port: 9080
+            initialDelaySeconds: 60
+            successThreshold: 1
+            failureThreshold: 3
+            periodSeconds: 30
+            timeoutSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /h/ready
+              port: 9080
+            initialDelaySeconds: 30
+            successThreshold: 1
+            failureThreshold: 3
+            periodSeconds: 10
+            timeoutSeconds: 10
+          volumeMounts:
+            - name: server-certs
+              mountPath: /opt/cert
+            - name: grpc-bridge-service-binding
+              mountPath: /bindings/grpc-bridge
+            - name: config-overrides
+              mountPath: /config/configDropins/overrides/
+            - mountPath: /etc/zeno/secrets/kafka
+              name: kafka-secret-vol
+            - name: search
+              mountPath: "/bindings/search/password"
+              subPath: password
+            - name: search
+              mountPath: "/bindings/search/username"
+              subPath: username
+            - name: search
+              mountPath: "/bindings/search/host"
+              subPath: host
+            - name: search
+              mountPath: "/bindings/search/port"
+              subPath: port
+            - name: search
+              mountPath: "/bindings/search/opensearch"
+              subPath: opensearch
+            - name: temp-volume
+              mountPath: /tmp
+            - name: wlp-output
+              mountPath: /opt/ibm/wlp/output/defaultServer
+            - name: logs
+              mountPath: /logs
+            - name: config-defaults
+              mountPath: /config/configDropins/defaults
+            - name: bootstrap-volume
+              mountPath: /config/bootstrap.properties
+              subPath: bootstrap.properties
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+      hostNetwork: false
+      hostPID: false
+      hostIPC: false
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: server-certs-raw
+          secret:
+            secretName: CUSTOMCONNECTORNAME
+            defaultMode: 420
+        - name: server-certs
+          emptyDir: {}
+        - name: config-overrides
+          emptyDir: {}
+        - name: kafka-secret-vol
+          secret:
+            defaultMode: 420
+            secretName: aiopsedge-kafka-application-secret          
+        - name: grpc-bridge-service-binding
+          projected:
+            sources:
+              - secret:
+                  name: connector-bridge-connection-info
+                  items:
+                    - key: ca.crt
+                      path: ca.crt
+                    - key: tls.crt
+                      path: tls.crt
+                    - key: tls.key
+                      path: tls.key
+                    - key: host
+                      path: host
+                    - key: port
+                      path: port
+              - secret:
+                  name: connector
+                  items:
+                    - key: id
+                      path: id
+                    - key: client-id
+                      path: client-id
+                    - key: client-secret
+                      path: client-secret
+              - secret:
+                  name: aiopsedge-health-check-key
+                  items:
+                    - key: apikey
+                      path: metric-api-key
+        - name: search
+          secret:
+            secretName: AIOPS-DYNAMIC-REPLACE-ELASTICSEARCHSECRETNAME
+            defaultMode: 420
+            optional: true                      
+        - name: temp-volume
+          emptyDir: {}
+        - name: config-defaults
+          emptyDir: {}
+        - name: logs
+          emptyDir: {}
+        - name: wlp-output
+          emptyDir: {}
+        - name: bootstrap-volume
+          emptyDir: {}
+

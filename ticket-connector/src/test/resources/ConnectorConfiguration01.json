@@ -1,0 +1,11 @@
+{
+    "collectionMode": "historical",
+    "data_flow": true,
+    "end": 1701907199999,
+    "start": 1701388800000,
+    "mappingsGithub": "mappings",
+    "token": "pass",
+    "repo": "repo",
+    "owner": "owner",
+    "url": "https://example.com"
+}

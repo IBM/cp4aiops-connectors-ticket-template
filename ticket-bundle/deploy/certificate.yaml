@@ -1,0 +1,21 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: CUSTOMBUNDLENAME
+spec:
+  commonName: CUSTOMBUNDLENAME
+  dnsNames:
+    - CUSTOMBUNDLENAME
+    - localhost
+    - CUSTOMBUNDLENAME.CUSTOMNAMESPACE
+    - CUSTOMBUNDLENAME.CUSTOMNAMESPACE.svc
+  duration: 2160h0m0s
+  issuerRef:
+    kind: Issuer
+    name: aiops-installation-tls-ca
+  renewBefore: 720h0m0s
+  secretName: CUSTOMBUNDLENAME-cert-secret
+  usages:
+    - digital signature
+    - key encipherment
+    - server auth
