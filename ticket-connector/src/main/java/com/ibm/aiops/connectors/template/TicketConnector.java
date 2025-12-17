@@ -503,12 +503,14 @@ public class TicketConnector extends NotificationConnectorBase {
 
     @Override
     public CompletableFuture<ActionResult> notifyCreate(ActionRequest request) {
-
+        // This is the trigger for incident creation. The incident create request comes via
+        // a Kafka message. We take that message and perform the appropriate action
         logger.log(Level.INFO, "Notify Creation Completable Future", request);
 
         ConnectorAction connectorAction = new ConnectorAction(ConnectorConstants.ISSUE_CREATE,
                 this._configuration.get(), this, _issueCreationActionCounter, _issueCreationActionSuccessCounter,
                 _issueCreationActionErrorCounter, request);
+        // The action is added to the queue, which eventually calls the IncidentActions class
         addActionToQueue(connectorAction);
         CompletableFuture<ActionResult> result = null;
         ObjectNode responseJson = JsonNodeFactory.instance.objectNode();
