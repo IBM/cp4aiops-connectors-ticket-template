@@ -35,6 +35,8 @@ public class Configuration {
     protected String mappingsGithub;
     protected String description;
     protected String username;
+    // For object mapping to work properly, the newly added Hello needs to be defined here, or there will be failures
+    protected String hello;
 
     public String getToken() {
         return Utils.encode(token);
