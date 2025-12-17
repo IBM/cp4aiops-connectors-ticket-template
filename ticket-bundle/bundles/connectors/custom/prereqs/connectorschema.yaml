@@ -53,6 +53,8 @@ spec:
         type: string
       owner:
         type: string
+      hello:
+        type: string
       repo:
         type: string
       issueSamplingRate:
@@ -183,6 +185,14 @@ spec:
         apiMapping: connection_config.owner
         formStep: addConnection
         isRequired: true
+      - id: hello
+        element: input
+        type: text
+        label: "Hello"
+        placeholder: "{{connector.github.form.owner.placeholder}}"
+        apiMapping: connection_config.hello
+        formStep: addConnection
+        isRequired: true        
       - id: repo
         element: input
         type: text
