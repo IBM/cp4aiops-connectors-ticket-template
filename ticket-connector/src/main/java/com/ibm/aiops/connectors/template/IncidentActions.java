@@ -49,6 +49,8 @@ public class IncidentActions implements Runnable {
 
     }
 
+    // If AIOps creates an incident, this is the action that is called. Actions aren't done in the 
+    // Incident polling
     private void createIncident(ConnectorAction action) {
 
         Counter actionCounter = action.getActionCounter();
