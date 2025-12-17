@@ -89,6 +89,8 @@ public class IssuePollingAction implements Runnable {
                 executorService = Executors.newSingleThreadScheduledExecutor();
                 // Get interval sampling rate. For incidents, it is in minutes. Default is 1
                 // second if not set by user
+                // This is the best starting point to see how we query the endpoint for incident data.
+                // This scheduler can do polling (for live data) or historical pull
                 executorService.scheduleAtFixedRate(this::fetchAndEmitIssue, 0, config.getIssueSamplingRate(),
                         TimeUnit.MINUTES);
             }
@@ -153,6 +155,7 @@ public class IssuePollingAction implements Runnable {
             // Get the first page of data
             // Remove trailing slash
 
+            // If you are calling a custom endpoint, you would modify the REST endpoint here
             String gitHubURL = config.getUrl().replaceAll("/$", "") + "/repos/" + config.getOwner() + "/"
                     + config.getRepo() + "/issues" + connModeBasedQueryString + "&per_page=100&page=1";
             HttpResponse<String> response = integration.getIssues(gitHubURL);
@@ -169,17 +172,19 @@ public class IssuePollingAction implements Runnable {
 
                     int len = resultsJSONArray.length();
                     if (len > 0) {
-
+                        // When querying an endpoiny, we get a list of tickets
                         ArrayList<Ticket> ticketList = new ArrayList<Ticket>();
 
                         for (int i = 0; i < len; i++) {
                             // Only get issues. PRs count as issues, so must be excluded
                             JSONObject jsonObj = resultsJSONArray.getJSONObject(i);
+                            // We need to normalize the incident data
                             processTickets(jsonObj, ticketList);
                         }
 
                         logger.log(Level.INFO, "resultsJSONArray: ", resultsJSONArray);
 
+                        // Once the ticket is normalized, we insert it into AIOps
                         if (ticketList.size() > 0)
                             ticketAction.insertIncident(ticketList);
 
@@ -223,6 +228,7 @@ public class IssuePollingAction implements Runnable {
 
     }
 
+    // This method is where we normalize the ticket data. You should do mapping here
     protected void processTickets(JSONObject obj, ArrayList<Ticket> ticketList) {
         // Exclude all PRs
         try {
@@ -239,6 +245,7 @@ public class IssuePollingAction implements Runnable {
                 json.put(Ticket.key_sys_domain, "");
 
                 json.put(Ticket.key_business_service, "");
+                // For incident data, we only care about closed ticket
                 if (obj.getString("state").equals("closed")) {
                     json.put(Ticket.key_state, "Closed");
                     json.put(Ticket.key_close_code, "Closed");
