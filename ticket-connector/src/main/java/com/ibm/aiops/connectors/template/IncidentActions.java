@@ -101,6 +101,7 @@ public class IncidentActions implements Runnable {
     }
 
     private void updateIncident(ConnectorAction action) {
+        /*
 
         Counter actionCounter = action.getActionCounter();
         Counter actionSuccessCounter = action.getActionSuccessCounter();
@@ -140,11 +141,12 @@ public class IncidentActions implements Runnable {
         } catch (Exception e) {
             actionErrorCounter.increment();
             logger.log(Level.SEVERE, e.getMessage(), e);
-        }
+        } */
 
     }
 
     private void closeIncident(ConnectorAction action) {
+        /*
 
         Counter actionCounter = action.getActionCounter();
         Counter actionSuccessCounter = action.getActionSuccessCounter();
@@ -188,6 +190,6 @@ public class IncidentActions implements Runnable {
             actionErrorCounter.increment();
             logger.log(Level.SEVERE, e.getMessage(), e);
         }
-
+ */
     }
 }
