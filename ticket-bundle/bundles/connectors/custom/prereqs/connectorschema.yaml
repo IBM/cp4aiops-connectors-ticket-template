@@ -32,17 +32,15 @@ spec:
         operations:
           - write
   encryptedFields:
-    - /token          
+    - /password          
   schema:
     allOf:
       - required:
           - url
-          - owner
-          - repo
-          - token
+          - password
           - username
     properties:
-      token:
+      password:
         format: secret
         type: string
       types:
@@ -50,10 +48,6 @@ spec:
       url:
         type: string
       username:
-        type: string
-      owner:
-        type: string
-      repo:
         type: string
       issueSamplingRate:
         type: integer
@@ -157,13 +151,13 @@ spec:
         formStep: addConnection
         isRequired: true
         isURL : true
-      - id: token
+      - id: password
         element: input
         type: password
-        label: "{{connector.github.form.token.label}}"
-        placeholder: "{{connector.github.form.token.placeholder}}"
-        helperText: "{{connector.github.form.token.helperText}}"
-        apiMapping: connection_config.token
+        label: "Password"
+        placeholder: "Password"
+        helperText: "Password"
+        apiMapping: connection_config.password
         formStep: addConnection
         isRequired: true
       - id: username
@@ -174,22 +168,6 @@ spec:
         apiMapping: connection_config.username
         formStep: addConnection
         maxCharLength: 600
-        isRequired: true
-      - id: owner
-        element: input
-        type: text
-        label: "{{connector.github.form.owner.label}}"
-        placeholder: "{{connector.github.form.owner.placeholder}}"
-        apiMapping: connection_config.owner
-        formStep: addConnection
-        isRequired: true
-      - id: repo
-        element: input
-        type: text
-        label: "{{connector.github.form.repo.label}}"
-        placeholder: "{{connector.github.form.repo.placeholder}}"
-        apiMapping: connection_config.repo
-        formStep: addConnection
         isRequired: true
       - apiMapping: connection_config.deploymentType
         element: input
