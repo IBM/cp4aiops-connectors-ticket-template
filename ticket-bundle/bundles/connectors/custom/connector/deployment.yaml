@@ -1,9 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: CUSTOMCONNECTORNAME
+  name: testtemplate
   labels:
-    app: CUSTOMCONNECTORNAME
+    app: testtemplate
     connectors.aiops.ibm.com/restart-on-secret-changed: ""
   annotations:
     cp4aiops.ibm.com/name: "AIOps connector ticket sample"
@@ -12,12 +12,12 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: CUSTOMCONNECTORNAME
+      app: testtemplate
       instance: connector
   template:
     metadata:
       labels:
-        app: CUSTOMCONNECTORNAME
+        app: testtemplate
         instance: connector
     spec:
       imagePullSecrets:
@@ -40,7 +40,7 @@ spec:
                     values:
                       - linux
       initContainers:
-        - image: CUSTOMCONNECTORIMAGENAME:CUSTOMCONNECTORIMAGETAG
+        - image: icr.io/ibm-aiops-dev/aiopsedge/testtemplate:0.0.1
           imagePullPolicy: Always
           name: cert-setup
           command:
@@ -81,9 +81,9 @@ spec:
             readOnlyRootFilesystem: true
             runAsNonRoot: true
       containers:
-        - image: CUSTOMCONNECTORIMAGENAME:CUSTOMCONNECTORIMAGETAG
+        - image: icr.io/ibm-aiops-dev/aiopsedge/testtemplate:0.0.1
           imagePullPolicy: Always
-          name: CUSTOMCONNECTORNAME
+          name: testtemplate
           env:
             - name: POD_NAME
               valueFrom:
@@ -223,7 +223,7 @@ spec:
       volumes:
         - name: server-certs-raw
           secret:
-            secretName: CUSTOMCONNECTORNAME
+            secretName: testtemplate
             defaultMode: 420
         - name: server-certs
           emptyDir: {}

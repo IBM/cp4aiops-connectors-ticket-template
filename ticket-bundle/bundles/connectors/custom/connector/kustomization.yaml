@@ -12,22 +12,22 @@ configurations:
   - varreference.yaml
 
 images:
-  - name: CUSTOMCONNECTORNAME
-    newName: CUSTOMCONNECTORIMAGENAME
-    newTag: CUSTOMCONNECTORIMAGETAG
+  - name: testtemplate
+    newName: icr.io/ibm-aiops-dev/aiopsedge/testtemplate
+    newTag: 0.0.1
 
 vars:
   - name: SERVICE_NAME
     objref:
       kind: Service
-      name: CUSTOMCONNECTORNAME
+      name: testtemplate
       apiVersion: v1
     fieldref:
       fieldpath: metadata.name
   - name: SERVICE_NAMESPACE
     objref:
       kind: Service
-      name: CUSTOMCONNECTORNAME
+      name: testtemplate
       apiVersion: v1
     fieldref:
       fieldpath: metadata.namespace

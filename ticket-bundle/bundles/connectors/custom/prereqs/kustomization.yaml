@@ -9,6 +9,6 @@ configurations:
   - custom-images.yaml
 
 images:
-  - name: CUSTOMCONNECTORNAME
-    newName: CUSTOMCONNECTORIMAGENAME
-    newTag: CUSTOMCONNECTORIMAGETAG
+  - name: testtemplate
+    newName: icr.io/ibm-aiops-dev/aiopsedge/testtemplate
+    newTag: 0.0.1

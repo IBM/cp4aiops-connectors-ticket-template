@@ -1,20 +1,20 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: CUSTOMBUNDLENAME
+  name: testtemplate
 spec:
-  commonName: CUSTOMBUNDLENAME
+  commonName: testtemplate
   dnsNames:
-    - CUSTOMBUNDLENAME
+    - testtemplate
     - localhost
-    - CUSTOMBUNDLENAME.CUSTOMNAMESPACE
-    - CUSTOMBUNDLENAME.CUSTOMNAMESPACE.svc
+    - testtemplate.katamari
+    - testtemplate.katamari.svc
   duration: 2160h0m0s
   issuerRef:
     kind: Issuer
     name: aiops-installation-tls-ca
   renewBefore: 720h0m0s
-  secretName: CUSTOMBUNDLENAME-cert-secret
+  secretName: testtemplate-cert-secret
   usages:
     - digital signature
     - key encipherment

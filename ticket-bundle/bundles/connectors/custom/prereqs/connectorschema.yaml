@@ -1,7 +1,7 @@
 apiVersion: connectors.aiops.ibm.com/v1beta1
 kind: ConnectorSchema
 metadata:
-  name: CUSTOMCONNECTORNAME
+  name: testtemplate
   labels:
     aiops-connector-category-ticketing: "true"
 spec:
@@ -76,8 +76,8 @@ spec:
         type: string            
     type: object
   uiSchema:
-    type: CUSTOMCONNECTORNAME
-    displayName: "CUSTOMCONNECTORDISPLAYNAME"
+    type: testtemplate
+    displayName: "Test Template"
     iconFileType: svg
     iconFileName: github
     categories: 
@@ -151,15 +151,6 @@ spec:
         formStep: addConnection
         isRequired: true
         isURL : true
-      - id: password
-        element: input
-        type: password
-        label: "Password"
-        placeholder: "Password"
-        helperText: "Password"
-        apiMapping: connection_config.password
-        formStep: addConnection
-        isRequired: true
       - id: username
         element: input
         type: text
@@ -168,6 +159,15 @@ spec:
         apiMapping: connection_config.username
         formStep: addConnection
         maxCharLength: 600
+        isRequired: true        
+      - id: password
+        element: input
+        type: password
+        label: "Password"
+        placeholder: "Password"
+        helperText: "Password"
+        apiMapping: connection_config.password
+        formStep: addConnection
         isRequired: true
       - apiMapping: connection_config.deploymentType
         element: input
