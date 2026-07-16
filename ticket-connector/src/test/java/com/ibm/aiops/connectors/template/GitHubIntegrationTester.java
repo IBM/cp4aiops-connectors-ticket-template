@@ -3,9 +3,9 @@ package com.ibm.aiops.connectors.template;
 import java.net.http.HttpResponse;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ibm.aiops.connectors.template.integrations.GithubIntegration;
+import com.ibm.aiops.connectors.template.integrations.CustomIntegration;
 
-public class GitHubIntegrationTester extends GithubIntegration {
+public class GitHubIntegrationTester extends CustomIntegration {
 
     int createIssueCount = 0;
     int updateIssueCount = 0;

@@ -3,7 +3,7 @@ kind: GitApp
 metadata:
   name: github-bundle
 spec:
-  repo: 'https://CUSTOMBUNDLENAME.{{ .Namespace }}.svc/git/cp4waiops-connectors'
+  repo: 'https://testtemplate.{{ .Namespace }}.svc/git/cp4waiops-connectors'
   branch: bundled-version
   authSecret:
     name: cp4waiops-connectors-deploy-auth-secret
@@ -15,6 +15,6 @@ spec:
       type: kustomize
       kustomization:
         images:
-          - name: CUSTOMCONNECTORNAME
-            newName: CUSTOMCONNECTORIMAGENAME
-            newTag: CUSTOMCONNECTORIMAGETAG
+          - name: testtemplate
+            newName: icr.io/ibm-aiops-dev/aiopsedge/testtemplate
+            newTag: 0.0.1

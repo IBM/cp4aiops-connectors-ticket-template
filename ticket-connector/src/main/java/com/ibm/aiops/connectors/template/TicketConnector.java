@@ -36,7 +36,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ibm.aiops.connectors.bridge.ConnectorStatus;
-import com.ibm.aiops.connectors.template.integrations.GithubIntegration;
+import com.ibm.aiops.connectors.template.integrations.CustomIntegration;
 import com.ibm.aiops.connectors.template.integrations.Integration;
 import com.ibm.aiops.connectors.template.integrations.IntegrationManager;
 import com.ibm.aiops.connectors.template.model.Configuration;
@@ -154,7 +154,7 @@ public class TicketConnector extends NotificationConnectorBase {
 
                 this._integrationManager.set(new IntegrationManager());
 
-                GithubIntegration githubIntegration = new GithubIntegration(httpClient.get(), this);
+                CustomIntegration githubIntegration = new CustomIntegration(httpClient.get(), this);
 
                 this._integrationManager.get().registerIntegration(githubIntegration);
 
@@ -176,9 +176,7 @@ public class TicketConnector extends NotificationConnectorBase {
     protected boolean hasConnectionCreateCfgChanged(Configuration oldConfig, Configuration newConfig) {
         if (oldConfig != null && booleanEqual(oldConfig.isData_flow(), newConfig.isData_flow())
                 && stringsEqual(oldConfig.getCollectionMode(), newConfig.getCollectionMode())
-                && stringsEqual(oldConfig.getOwner(), newConfig.getOwner())
-                && stringsEqual(oldConfig.getRepo(), newConfig.getRepo())
-                && stringsEqual(oldConfig.getToken(), newConfig.getToken())
+                && stringsEqual(oldConfig.getPassword(), newConfig.getPassword())
                 && stringsEqual(oldConfig.getUrl(), newConfig.getUrl())
                 && stringsEqual(oldConfig.getUsername(), newConfig.getUsername())
                 && stringsEqual(oldConfig.getMappingsGithub(), newConfig.getMappingsGithub())
@@ -220,11 +218,11 @@ public class TicketConnector extends NotificationConnectorBase {
     }
 
     protected void buildHttpClient(Configuration oldConfig, Configuration newConfig) throws ConnectorException {
+        
         // Skip if no change was made
         if (httpClient.get() != null && oldConfig != null && stringsEqual(oldConfig.getUrl(), newConfig.getUrl())
-                && stringsEqual(oldConfig.getOwner(), newConfig.getOwner())
-                && stringsEqual(oldConfig.getRepo(), newConfig.getRepo())
-                && stringsEqual(oldConfig.getToken(), newConfig.getToken())) {
+                && stringsEqual(oldConfig.getUsername(), newConfig.getUsername())
+                && stringsEqual(oldConfig.getPassword(), newConfig.getPassword())) {
             return;
         }
 
@@ -232,14 +230,12 @@ public class TicketConnector extends NotificationConnectorBase {
 
         // Build client
         try {
-            HttpClientUtil client = new HttpClientUtil(newConfig.getUrl(), newConfig.getOwner(), newConfig.getRepo(),
-                    newConfig.getToken());
+            HttpClientUtil client = new HttpClientUtil(newConfig.getUrl(), newConfig.getUsername(), newConfig.getPassword());
             httpClient.set(client);
             logger.log(Level.INFO, "Http client created");
         } catch (Exception error) {
             throw new ConnectorException("Failed to client http client", error);
-        }
-
+        } 
     }
 
     protected Integration getCurrentIntegration() {

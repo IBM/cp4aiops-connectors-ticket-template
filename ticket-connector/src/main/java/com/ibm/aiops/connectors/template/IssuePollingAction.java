@@ -136,6 +136,7 @@ public class IssuePollingAction implements Runnable {
             logger.log(Level.INFO, "Modified Date and Time: " + dateStr);
         }
 
+        System.out.println("BEFORE QUERYALLPAGE");
         queryAllPages(queryString);
     }
 
@@ -145,7 +146,18 @@ public class IssuePollingAction implements Runnable {
      * @param dateStr
      */
     protected void queryAllPages(String connModeBasedQueryString) {
+        System.out.println("BEFORE QUERYALLPAGE 2");
+        HttpResponse<String> response = integration.getIssues("");
+        String results = "";
 
+
+        if (response != null) {
+            results = response.body().toString();
+        }
+
+        System.out.println("RESULTS : " + results);
+        // TODO: update all query pages with logic
+/*
         try {
             // Pagination reference:
             // https://docs.github.com/en/rest/using-the-rest-api/using-pagination-in-the-rest-api?apiVersion=2022-11-28
@@ -220,6 +232,7 @@ public class IssuePollingAction implements Runnable {
             actionErrorCounter.increment();
             logger.log(Level.WARNING, "Failed to query all pages ", e);
         }
+             */
 
     }
 

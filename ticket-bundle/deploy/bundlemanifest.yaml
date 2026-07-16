@@ -1,37 +1,37 @@
 apiVersion: connectors.aiops.ibm.com/v1beta1
 kind: BundleManifest
 metadata:
-  name: CUSTOMBUNDLENAME
+  name: testtemplate
 spec:
   prereqs:
-    repo: 'https://CUSTOMBUNDLENAME.CUSTOMNAMESPACE.svc/git/cp4waiops-connectors'
+    repo: 'https://testtemplate.katamari.svc/git/cp4waiops-connectors'
     branch: bundled-version
     authSecret:
       name: cp4waiops-connectors-deploy-auth-secret
     certSecret:
-      name: CUSTOMBUNDLENAME-cert-secret
+      name: testtemplate-cert-secret
     components:
       - name: deployment
         path: /bundles/connectors/custom/prereqs
         type: kustomize
         kustomization:
           images:
-            - name: CUSTOMBUNDLENAME
-              newName: CUSTOMBUNDLEIMAGENAME
-              newTag: CUSTOMBUNDLEIMAGETAG
+            - name: testtemplate
+              newName: icr.io/ibm-aiops-dev/aiopsedge/testtemplatebundle
+              newTag: 0.0.1
   instanced:
-    repo: 'https://CUSTOMBUNDLENAME.CUSTOMNAMESPACE.svc/git/cp4waiops-connectors'
+    repo: 'https://testtemplate.katamari.svc/git/cp4waiops-connectors'
     branch: bundled-version
     authSecret:
       name: cp4waiops-connectors-deploy-auth-secret
     certSecret:
-      name: CUSTOMBUNDLENAME-cert-secret
+      name: testtemplate-cert-secret
     components:
       - name: connector
         path: /bundles/connectors/custom/connector
         type: kustomize
         kustomization:
           images:
-            - name: CUSTOMBUNDLENAME
-              newName: CUSTOMBUNDLEIMAGENAME
-              newTag: CUSTOMBUNDLEIMAGETAG
+            - name: testtemplate
+              newName: icr.io/ibm-aiops-dev/aiopsedge/testtemplatebundle
+              newTag: 0.0.1

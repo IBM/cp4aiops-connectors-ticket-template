@@ -17,7 +17,7 @@ import org.mockito.Mockito;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ibm.aiops.connectors.template.integrations.GithubIntegration;
+import com.ibm.aiops.connectors.template.integrations.CustomIntegration;
 
 import io.cloudevents.CloudEvent;
 
@@ -65,7 +65,7 @@ public class TestGithubIntegration {
         when(httpClient.post(Mockito.anyString(), Mockito.anyString()))
                 .thenReturn(CompletableFuture.completedFuture(httpResponse));
 
-        GithubIntegration ghi = new GithubIntegration(httpClient, base);
+        CustomIntegration ghi = new CustomIntegration(httpClient, base);
 
         ObjectNode createIssueResults = ghi.createIssue(root, DEFAULT_JSONATA_DATA);
 
@@ -168,7 +168,7 @@ public class TestGithubIntegration {
         when(httpClient.patch(Mockito.anyString(), Mockito.anyString()))
                 .thenReturn(CompletableFuture.completedFuture(httpResponse));
 
-        GithubIntegration ghi = new GithubIntegration(httpClient, base);
+        CustomIntegration ghi = new CustomIntegration(httpClient, base);
         String jsonNataData = "{}";
 
         // 1. Test with open state

@@ -1,17 +1,17 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: CUSTOMBUNDLENAME
+  name: testtemplate
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: "CUSTOMBUNDLENAME"
+      app: "testtemplate"
   template:
     metadata:
       creationTimestamp: null
       labels:
-        app: CUSTOMBUNDLENAME
+        app: testtemplate
     spec:
       restartPolicy: Always
       initContainers:
@@ -46,7 +46,7 @@ spec:
           envFrom:
             - secretRef:
                 name: cp4waiops-connectors-deploy-auth-secret
-          image: 'CUSTOMBUNDLEIMAGENAME:CUSTOMBUNDLEIMAGETAG'
+          image: 'icr.io/ibm-aiops-dev/aiopsedge/testtemplatebundle:0.0.1'
           args:
             - '-c'
             - 'htpasswd -bc /conf/.htpasswd ${username} ${password}'
@@ -125,7 +125,7 @@ spec:
             - name: run
               mountPath: /etc/httpd/run
           terminationMessagePolicy: File
-          image: 'CUSTOMBUNDLEIMAGENAME:CUSTOMBUNDLEIMAGETAG'
+          image: 'icr.io/ibm-aiops-dev/aiopsedge/testtemplatebundle:0.0.1'
       serviceAccount: cp4waiops-connectors-deploy
       volumes:
         - name: pass
@@ -136,7 +136,7 @@ spec:
             defaultMode: 420
         - name: certs
           secret:
-            secretName: CUSTOMBUNDLENAME-cert-secret
+            secretName: testtemplate-cert-secret
             defaultMode: 420
         - name: tmp
           emptyDir: {}

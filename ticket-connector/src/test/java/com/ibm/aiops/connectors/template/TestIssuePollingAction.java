@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.ibm.aiops.connectors.template.integrations.GithubIntegration;
+import com.ibm.aiops.connectors.template.integrations.CustomIntegration;
 
 public class TestIssuePollingAction {
     // In case of failure, try: export JAVA_HOME=$(/usr/libexec/java_home)
@@ -36,7 +36,7 @@ public class TestIssuePollingAction {
 
         when(httpClient.getByURL("http://example.com")).thenReturn(CompletableFuture.completedFuture(httpResponse));
 
-        GithubIntegration gh = new GithubIntegration(httpClient, ticketConnector);
+        CustomIntegration gh = new CustomIntegration(httpClient, ticketConnector);
         HttpResponse<String> response = gh.getIssues("http://example.com");
 
         Assertions.assertEquals("{\"hello\":\"world\"}", response.body());

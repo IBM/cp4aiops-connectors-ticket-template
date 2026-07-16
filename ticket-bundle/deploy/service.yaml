@@ -1,7 +1,7 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: CUSTOMBUNDLENAME
+  name: testtemplate
 spec:
   ipFamilies:
     - IPv4
@@ -15,6 +15,6 @@ spec:
   ipFamilyPolicy: SingleStack
   sessionAffinity: None
   selector:
-    app: CUSTOMBUNDLENAME
+    app: testtemplate
 status:
   loadBalancer: {}

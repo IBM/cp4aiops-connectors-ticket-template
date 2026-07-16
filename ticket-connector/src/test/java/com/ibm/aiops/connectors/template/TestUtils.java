@@ -25,7 +25,7 @@ import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
-import com.ibm.aiops.connectors.template.integrations.GithubIntegration;
+import com.ibm.aiops.connectors.template.integrations.CustomIntegration;
 import com.ibm.cp4waiops.connectors.sdk.Util;
 
 import org.json.JSONException;
