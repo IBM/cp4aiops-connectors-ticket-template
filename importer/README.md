@@ -10,16 +10,18 @@ Login to OpenShift
 
 In one terminal, run the following:
 ```bash
-export EL_USER=`oc get secret iaf-system-elasticsearch-es-default-user -o go-template --template="{{.data.username|base64decode}}"`
-export EL_PWD=`oc get secret iaf-system-elasticsearch-es-default-user -o go-template --template="{{.data.password|base64decode}}"`
-kubectl port-forward iaf-system-elasticsearch-es-aiops-0 9201:9200
+export EL_SECRET_NAME=`oc get AIOpsEdge aiopsedge -o jsonpath='{.spec.elasticsearchSecret}'`
+export DIRECT_TO_SEARCH_PASSWORD=`oc get secret $EL_SECRET_NAME -o go-template --template="{{.data.password|base64decode}}"`
+export DIRECT_TO_SEARCH_USERNAME=`oc get secret $EL_SECRET_NAME -o go-template --template="{{.data.username|base64decode}}"`
+kubectl port-forward aiops-opensearch-all-000 9201:9200
 ```
 
 ## Working with Elastic
 On the second terminal, run the following:
 ```bash
-export EL_USER=`oc get secret iaf-system-elasticsearch-es-default-user -o go-template --template="{{.data.username|base64decode}}"`
-export EL_PWD=`oc get secret iaf-system-elasticsearch-es-default-user -o go-template --template="{{.data.password|base64decode}}"`
+export EL_SECRET_NAME=`oc get AIOpsEdge aiopsedge -o jsonpath='{.spec.elasticsearchSecret}'`
+export DIRECT_TO_SEARCH_PASSWORD=`oc get secret $EL_SECRET_NAME -o go-template --template="{{.data.password|base64decode}}"`
+export DIRECT_TO_SEARCH_USERNAME=`oc get secret $EL_SECRET_NAME -o go-template --template="{{.data.username|base64decode}}"`
 curl -X POST --user $EL_USER:$EL_PWD https://localhost:9201/snowincident/_search -k
 ```
 
@@ -42,8 +44,9 @@ If successful, you will see:
 For running this Java program:
 ```bash
 mvn install
-export DIRECT_TO_SEARCH_PASSWORD=`oc get secret iaf-system-elasticsearch-es-default-user -o go-template --template="{{.data.password|base64decode}}"`
-export DIRECT_TO_SEARCH_USERNAME=`oc get secret iaf-system-elasticsearch-es-default-user -o go-template --template="{{.data.username|base64decode}}"`
+export EL_SECRET_NAME=`oc get AIOpsEdge aiopsedge -o jsonpath='{.spec.elasticsearchSecret}'`
+export DIRECT_TO_SEARCH_PASSWORD=`oc get secret $EL_SECRET_NAME -o go-template --template="{{.data.password|base64decode}}"`
+export DIRECT_TO_SEARCH_USERNAME=`oc get secret $EL_SECRET_NAME -o go-template --template="{{.data.username|base64decode}}"`
 export DIRECT_TO_SEARCH_PORT="9201"
 export DIRECT_TO_SEARCH_HOSTNAME="127.0.0.1"
 mvn exec:java -Dexec.mainClass="com.ibm.aiops.connectors.importer.JSONImporter"
