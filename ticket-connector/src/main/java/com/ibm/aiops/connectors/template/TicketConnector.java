@@ -145,6 +145,8 @@ public class TicketConnector extends NotificationConnectorBase {
 
         buildHttpClient(_configuration.get(), newConfiguration);
         try {
+            // Now we have the newly created "hello" property in the model, you can perform actions on this
+            // such as determining if hasConnectionCreateCfgChanged should result in a change
             // TODO: remove this temporary workaround
             if (!_configured.get() || hasConnectionCreateCfgChanged(_configuration.get(), newConfiguration)) {
                 logger.log(Level.INFO, "Configuring ConnectionId: " + config.getConnectionID());
@@ -174,6 +176,8 @@ public class TicketConnector extends NotificationConnectorBase {
     }
 
     protected boolean hasConnectionCreateCfgChanged(Configuration oldConfig, Configuration newConfig) {
+        // For example, if we care about the "hello" property and want to make a change, we compare
+        // the new and old property to see if anything has changed
         if (oldConfig != null && booleanEqual(oldConfig.isData_flow(), newConfig.isData_flow())
                 && stringsEqual(oldConfig.getCollectionMode(), newConfig.getCollectionMode())
                 && stringsEqual(oldConfig.getOwner(), newConfig.getOwner())
@@ -181,6 +185,7 @@ public class TicketConnector extends NotificationConnectorBase {
                 && stringsEqual(oldConfig.getToken(), newConfig.getToken())
                 && stringsEqual(oldConfig.getUrl(), newConfig.getUrl())
                 && stringsEqual(oldConfig.getUsername(), newConfig.getUsername())
+                && stringsEqual(oldConfig.getHello(), newConfig.getHello())
                 && stringsEqual(oldConfig.getMappingsGithub(), newConfig.getMappingsGithub())
                 && (oldConfig.getIssueSamplingRate() == newConfig.getIssueSamplingRate())
                 && (oldConfig.getStart() == newConfig.getStart())) {
@@ -498,12 +503,14 @@ public class TicketConnector extends NotificationConnectorBase {
 
     @Override
     public CompletableFuture<ActionResult> notifyCreate(ActionRequest request) {
-
+        // This is the trigger for incident creation. The incident create request comes via
+        // a Kafka message. We take that message and perform the appropriate action
         logger.log(Level.INFO, "Notify Creation Completable Future", request);
 
         ConnectorAction connectorAction = new ConnectorAction(ConnectorConstants.ISSUE_CREATE,
                 this._configuration.get(), this, _issueCreationActionCounter, _issueCreationActionSuccessCounter,
                 _issueCreationActionErrorCounter, request);
+        // The action is added to the queue, which eventually calls the IncidentActions class
         addActionToQueue(connectorAction);
         CompletableFuture<ActionResult> result = null;
         ObjectNode responseJson = JsonNodeFactory.instance.objectNode();
